@@ -1,6 +1,10 @@
 /**
  * Created by jerry on 2017/4/14.
  */
+//import { Loading } from 'element-ui';
+import { MessageBox } from 'element-ui';
+import { Message } from 'element-ui';
+
 var SIGN_REGEXP = /([yMdhsm])(\1*)/g
 var DEFAULT_PATTERN = 'yyyy-MM-dd'
 function padding (s, len) {
@@ -57,6 +61,57 @@ export default {
       return null
     }
 
+  },
+  error(data){
+      // let loading = Loading.service({});
+      // loading.close();
+      console.info(data);
+      console.log(data);
+
+      let message = '';
+      if('code' in data &&　'message' in data){
+        message = `${data.code} ${data.message}`;
+      }
+      else if ('statusText' in data){
+        message = `${data.status} ${data.statusText} `;
+      }else if ('message' in data){
+        message = data.message;
+      }else{
+        message = data;
+      }
+      
+      MessageBox.alert(message,'错误');
+
+  },
+  info(message,options={title:'提示'}){
+      // let loading = Loading.service({});
+      // loading.close();
+      MessageBox.alert(message,options);
+      //Message.success({showClose: true, message: message, duration: 2000});
+  },
+  message(message,duration=2000){
+    Message.success({showClose: true, message: message, duration: duration});
+  },
+  confirm(message,options={type: 'warning',title:'提示'}){
+    let p = new Promise( (resolve,reject) => {
+        MessageBox.confirm(message,options).then(resolve).catch(reject);
+    });
+    return p;
+  },prompt(message,options={title:'提示'}){
+    let p = new Promise( (resolve,reject) => {
+        MessageBox.prompt(message,options).then(resolve).catch(reject);
+    });
+    return p;
+  },
+  response(data){
+    let p = new Promise( (resolve,reject) => {
+        if(data.status == 'success'){
+          resolve(data);
+        }else{
+          reject(data);
+        }
+    });
+    return p;
   }
 
 }

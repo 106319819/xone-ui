@@ -1,4 +1,5 @@
 <template>
+
   <el-row class="warp">
     <el-col :span="24" class="warp-breadcrum">
       <el-breadcrumb separator="/">
@@ -14,7 +15,7 @@
          :parent="dialogs.parent" v-on:onCreateChild="onCreateChild"
          v-if="dialogs.addChildVisible" :visible.sync="dialogs.addChildVisible"></add-child>
 
-      <el-button  @click="handleSearch" :disabled="buttons.disabled">删除</el-button>
+      <el-button  @click="onDelete" :disabled="buttons.disabled">删除</el-button>
       <el-button  @click="onModifyButton('add-child-dialog')"  :disabled="buttons.disabled">修改</el-button>
       <edit-dialog ref="edit-dialog" title = "修改" :modify ="true" :organization="dialogs.organization"
          :parent="dialogs.parent" v-on:onModify="onModify"
@@ -35,22 +36,33 @@
     </el-row>
     <el-col :span="6">
       <el-tree :data="tree" :props="props" node-key="organizationId" :load="loadNode" lazy highlight-current
-        @node-click="handleNodeClick" v-loading="loading" ref="tree">
+       @node-click="handleNodeClick" v-loading="loading" ref="tree">
       </el-tree>
     </el-col>
-    <el-col :span="18">
-      <el-table :data="organizations" highlight-current-row v-loading="loading" style="width: 100%;">
-        <el-table-column type="index" width="60"></el-table-column>
-        <el-table-column prop="organizationId" label="ID" width="120" sortable></el-table-column>
-        <el-table-column prop="organizationName" label="名称" width="120" sortable></el-table-column>
-        <el-table-column prop="organizationNameEn" label="英文名称" width="100" :formatter="formatSex" sortable></el-table-column>
-        <el-table-column prop="organizationCode" label="编码" min-width="160" sortable></el-table-column>
-        <el-table-column prop="level" label="层级" sortable></el-table-column>
-        <el-table-column prop="parentId" label="上级" sortable></el-table-column>
-        <el-table-column prop="sortNo" label="排序" sortable></el-table-column>
-        <el-table-column prop="comment" label="备注" sortable></el-table-column>
-      </el-table>
 
+    <el-col :span="18">
+          <!--工具条-->
+      <el-row>
+        <el-col :span="18" class="toolbar">
+          <el-button type="danger" @click="batchDeleteBook" :disabled="this.sels.length===0">批量删除</el-button>
+          <el-pagination layout="prev, pager, next" @current-change="handleCurrentChange" :page-size="10" :total="total"
+                        style="float:right;">
+          </el-pagination>
+        </el-col>
+      </el-row>
+      <el-row>        
+        <el-table :data="organizations" highlight-current-row v-loading="loading" style="width: 100%;">
+          <el-table-column type="index" width="60"></el-table-column>
+          <el-table-column prop="organizationId" label="ID" width="120" sortable></el-table-column>
+          <el-table-column prop="organizationName" label="名称" width="120" sortable></el-table-column>
+          <el-table-column prop="organizationNameEn" label="英文名称" width="100" :formatter="formatSex" sortable></el-table-column>
+          <el-table-column prop="organizationCode" label="编码" min-width="160" sortable></el-table-column>
+          <el-table-column prop="level" label="层级" sortable></el-table-column>
+          <el-table-column prop="parentId" label="上级" sortable></el-table-column>
+          <el-table-column prop="sortNo" label="排序" sortable></el-table-column>
+          <el-table-column prop="comment" label="备注" sortable></el-table-column>
+        </el-table>
+      </el-row>
     </el-col>
   </el-row>
 
@@ -60,6 +72,7 @@
 <script>
   import API from '../../api/api_organization';
   import Dialog from './dialog-form.vue'
+  import Util from '../../common/util.js';
   export default {
     data() {
       
@@ -87,7 +100,7 @@
         total: 0,
         page: 1,
         limit: 10,
-        loading: false
+        sels:[]
       }
     },
     methods: {
@@ -194,6 +207,37 @@
         console.log("onModify");
         console.log(data);
       },
+      onDelete(){
+        let that = this;
+        let organization = this.$refs.tree.getCurrentNode();;
+        //function(action, instance)，action 的值为'confirm', 'cancel'或'close', instance 为 MessageBox 实例
+
+        this.$confirm(`确认删除${organization.organizationName} 及其孩子节点吗?`, '提示',{type: 'warning'}).then(() => {
+          that.loading = true;
+          API.delete(organization.organizationId).then(function (result) {
+            that.loading = false;
+            if (result &&  result.status == 'success') {
+              let node = that.$refs.tree.getNode(organization);
+              node.remove();
+              that.$message.success({showClose: true, message: '删除成功', duration: 1500});
+            }
+          }, function (err) {
+            that.loading = false;
+            that.$message.error({showClose: true, message: err.toString(), duration: 2000});
+          }).catch(function (error) {
+            that.loading = false;
+            console.log(error);
+            that.$message.error({showClose: true, message: '请求出现异常', duration: 2000});
+          });
+        }).catch(() => {
+        });
+      },
+      remove(node,data){
+        let parent = node.parent;
+        let children = parent.data.children || parent.data;
+        let index = children.findIndex(d => d.organizationId === data.organizationId);
+        children.splice(index, 1);
+      }
     },
     mounted() {
       //this.findByParent(0);

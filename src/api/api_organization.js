@@ -18,8 +18,8 @@ export default {
     return API.PATCH('/api/organization/update', params)
   },
 
-  //查询获取user列表(通过page分页)
-  findList: params => {
-    return API.GET('/api/v1/users', params)
+  //删除组织
+  delete: params => {
+    return API.POST(`/api/organization/delete-by-id/${params}`, params)
   },
 }

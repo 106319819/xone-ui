@@ -75,11 +75,10 @@ let router = new Router({
       component: Home,
       name: '组织管理',
       menuShow: true,
-      leaf: true, // 只有一个节点
       iconCls: 'iconfont icon-shuzhuangtu_o', // 图标样式class
       children: [
         {path: '/organization/list', component: OrganizationList, name: '组织列表', menuShow: true},
-        {path:'/organization/edit',component:OrganizationEdit,name:'组织编辑'}
+        {path:'/organization/edit',component:OrganizationEdit,name:'组织编辑', menuShow: true}
       ]
     },
   ]

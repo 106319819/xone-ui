@@ -3,22 +3,26 @@
  */
 import axios from 'axios'
 import {bus} from '../bus.js'
-
+import { Loading } from 'element-ui';
 axios.defaults.withCredentials = true;
 // axios.defaults.headers.common['Authorization'] = AUTH_TOKEN;
 // axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded;charset=UTF-8';//配置请求头
 
 //添加一个请求拦截器
-// axios.interceptors.request.use(function (config) {
-//   console.dir(config);
-//   return config;
-// }, function (error) {
-//   // Do something with request error
-//   return Promise.reject(error);
-// });
+axios.interceptors.request.use(function (config) {
+  // let loading = Loading.service({});
+  return config;
+}, function (error) {
+  // Do something with request error
+  // let loading = Loading.service({});
+  // loading.close;
+  return Promise.reject(error);
+});
 
 // 添加一个响应拦截器
 axios.interceptors.response.use(function (response) {
+  // let loading = Loading.service({});
+  // loading.close;
   if (response.data && response.data.errcode) {
     if (parseInt(response.data.errcode) === 40001) {
       //未登录

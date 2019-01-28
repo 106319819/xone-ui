@@ -40,6 +40,8 @@
 </template>
 <script>
   import API from '../../api/api_organization';
+  import Util from '../../common/util.js';
+
   export default{
     props: {
       visible: {type: Boolean,default: false},
@@ -88,27 +90,42 @@
           if(that.parent.organizationId){
             that.organization.parentId = that.parent.organizationId;
           }
-          that.loading = true;
-          API.create(that.organization).then(function (result) {
-              that.loading = false;
-              if(result.status == 'success'){
-                that.$message.success({showClose: true, message: '新增成功', duration: 2000});
-                //通知parent，创建成功消息
-                that.$emit('onCreateChild',result.data);
-              } else {
-                let txt = `新增失败，原因：${result.error} ${result.message}`;
-                that.$message.error({showClose: true, message: txt, duration: 2000});
-              }
-            }, function (err) {
-              that.loading = false;
-              that.$message.error({showClose: true, message: err.toString(), duration: 2000});
-            }).catch(function (error) {
-              that.loading = false;
-              console.log(error);
-              that.$message.error({showClose: true, message: '请求出现异常', duration: 2000});
-            });
+          // that.loading = true;
+          API.create(that.organization).then(Util.response).then(that.onCreate).catch(Util.error);
+        //    res function (result) {
+        //       // that.loading = false;
+        //       if(result.status == 'success'){
+        //         that.$message.success({showClose: true, message: '新增成功', duration: 2000});
+        //         //通知parent，创建成功消息
+        //         that.$emit('onCreateChild',result.data);
+        //       } else {
+        //         let txt = `新增失败，原因：${result.error} ${result.message}`;
+        //         that.$message.error({showClose: true, message: txt, duration: 2000});
+        //       }
+        //     }, function (err) {
+        //       // that.loading = false;
+        //       that.$message.error({showClose: true, message: err.toString(), duration: 2000});
+        //     }).catch(function (error) {
+        //       // that.loading = false;
+        //       console.log(error);
+        //       that.$message.error({showClose: true, message: '请求出现异常', duration: 2000});
+        //     });
           
-        });
+         });
+      },
+      onCreate(result){
+        // Util.confirm('确认要新增吗？').then((action) =>{
+        //   Util.info(`${action}`);
+        // }).catch((action)=>{
+        //   Util.info(`${action}`);
+        // });
+        // Util.prompt('请输入需要提交的数据').then(({action,value})=> {
+        //   Util.info(`${action}  ${value}`);
+        // }).catch((action)=>{
+        //   Util.info('取消输入');
+        // });
+        this.$emit('onCreateChild',result.data);
+       Util.info('新增成功！');        
       },
       update(){
         let that = this;
@@ -122,9 +139,9 @@
         }else{
           param.isLeaf = '0';
         }
-          that.loading = true;
+          // that.loading = true;
           API.update(param).then(function (result) {
-              that.loading = false;
+              // that.loading = false;
               if(result.status == 'success'){
                 that.$message.success({showClose: true, message: '更新成功', duration: 2000});
                 //通知parent，创建成功消息
@@ -134,10 +151,10 @@
                 that.$message.error({showClose: true, message: txt, duration: 2000});
               }
             }, function (err) {
-              that.loading = false;
+              // that.loading = false;
               that.$message.error({showClose: true, message: err.toString(), duration: 2000});
             }).catch(function (error) {
-              that.loading = false;
+              // that.loading = false;
               console.log(error);
               that.$message.error({showClose: true, message: '请求出现异常', duration: 2000});
             });
