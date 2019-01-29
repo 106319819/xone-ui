@@ -83,7 +83,7 @@ export default {
       MessageBox.alert(message,'错误');
 
   },
-  info(message,options={title:'提示'}){
+  alert(message,options={title:'提示'}){
       // let loading = Loading.service({});
       // loading.close();
       MessageBox.alert(message,options);

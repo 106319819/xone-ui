@@ -22,4 +22,8 @@ export default {
   delete: params => {
     return API.POST(`/api/organization/delete-by-id/${params}`, params)
   },
+  //删除组织
+  deleteBatch: params => {
+    return API.POST(`/api/organization/delete-batch`, params)
+  },
 }
