@@ -1,4 +1,4 @@
-# litadmin
+# birip-admin
 > 一个基于vue2.x编写的后端管理项目
 
 ## 介绍
@@ -49,7 +49,7 @@
 可以直接在git上下载项目源码。
 或者通过git命令下载
 #git命令下载
-git clone https://github.com/jerry9022/LitAdmin
+git clone https://github.com/106319819/birip-ui.git
 
 假定项目已经下载下来了。
 

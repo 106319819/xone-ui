@@ -93,12 +93,12 @@
           <el-table-column label="操作" width="150">
             <template slot-scope="scope">
               <el-button @click="onModifyButton('add-child-dialog',scope.$index,scope.row)">修改</el-button>
-              <el-button @click="onDelete(scope.$index,scope.row)">删除</el-button>
+              <el-button @click="onDeleteOrganization(scope.$index,scope.row)">删除</el-button>
             </template>
           </el-table-column>
 
-          <el-table-column prop="organizationId" label="ID" width="120" sortable></el-table-column>
-          <el-table-column prop="organizationName" label="名称" width="120" sortable></el-table-column>
+          <el-table-column prop="organizationId" label="编码"  sortable></el-table-column>
+          <el-table-column prop="organizationName" label="名称" sortable></el-table-column>
           <el-table-column
             prop="organizationNameEn"
             label="英文名称"
@@ -106,10 +106,10 @@
             :formatter="formatSex"
             sortable
           ></el-table-column>
-          <el-table-column prop="organizationCode" label="编码" min-width="160" sortable></el-table-column>
+          <!-- <el-table-column prop="organizationCode" label="编码" min-width="160" sortable></el-table-column>
           <el-table-column prop="level" label="层级" sortable></el-table-column>
           <el-table-column prop="parentId" label="上级" sortable></el-table-column>
-          <el-table-column prop="sortNo" label="排序" sortable></el-table-column>
+          <el-table-column prop="sortNo" label="排序" sortable></el-table-column> -->
           <el-table-column prop="comment" label="备注" sortable></el-table-column>
         </el-table>
       </el-col>
@@ -290,11 +290,12 @@ export default {
       console.log("onModify");
       console.log(data);
     },
-    onDelete(index, row) {
+    onDeleteOrganization(index, row){},
+    onDelete() {
       let that = this;
-      // let organization = this.$refs.tree.getCurrentNode();
+      let organization = this.$refs.tree.getCurrentNode();
       //function(action, instance)，action 的值为'confirm', 'cancel'或'close', instance 为 MessageBox 实例
-      Util.confirm(`确认删除 ${row.organizationName} 及其孩子节点吗?`)
+      Util.confirm(`确认删除 ${organization.organizationName} 及其孩子节点吗?`)
         .then(that.doDeleteNode)
         .catch(action => {});
     },
