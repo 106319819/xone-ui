@@ -92,9 +92,9 @@ export default {
   message(message,duration=2000){
     Message.success({showClose: true, message: message, duration: duration});
   },
-  confirm(message,options={type: 'warning',title:'提示'}){
+  confirm(message,params,options={type: 'warning',title:'提示'}){
     let p = new Promise( (resolve,reject) => {
-        MessageBox.confirm(message,options).then(resolve).catch(reject);
+        MessageBox.confirm(message,options).then(()=>{resolve(params)}).catch(()=>{reject(params)});
     });
     return p;
   },prompt(message,options={title:'提示'}){

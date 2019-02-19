@@ -6,9 +6,8 @@ import Dashboard from '@/components/Dashboard'
 import BookList from '@/components/book/list'
 import BookCategoryList from '@/components/bookcategory/list'
 
-import UserList from '@/components/user/list'
-import UserChangePwd from '@/components/user/changepwd'
-import UserProfile from '@/components/user/profile'
+import PersonList from '@/components/person/list'
+import UserChangePwd from '@/components/person/changepwd'
 
 import OrganizationList from '@/components/organization/list'
 import OrganizationEdit from '@/components/organization/edit-form'
@@ -46,7 +45,7 @@ let router = new Router({
       leaf: true, // 只有一个节点
       iconCls: 'iconfont icon-qunzu_o', // 图标样式class
       children: [
-        {path: '/user/list', component: UserList, name: '用户列表', menuShow: true}
+        {path: '/person/list', component: PersonList, name: '用户列表', menuShow: true}
       ]
     },
     {
@@ -67,8 +66,8 @@ let router = new Router({
       menuShow: true,
       iconCls: 'iconfont icon-quanjushezhi_o',
       children: [
-        {path: '/user/profile', component: UserProfile, name: '个人信息', menuShow: true},
-        {path: '/user/changepwd', component: UserChangePwd, name: '修改密码', menuShow: true}
+        {path: '/person/list', component: PersonList, name: '个人信息', menuShow: true},
+        {path: '/person/changepwd', component: UserChangePwd, name: '修改密码', menuShow: true}
       ]
     },{
       path: '/',
