@@ -3,6 +3,17 @@
 	<!--工具栏-->
 	<div class="toolbar" style="float:left;padding-top:10px;padding-left:15px;">
 		<el-form :inline="true" :model="filters" :size="size">
+      <el-form-item label="子系统">
+        <el-select v-model="dataForm.subSystemId" placeholder="请选择子系统" @change="findTreeData" >
+          <el-option
+            v-for="item in subSystems"
+            :key="item.subSystemId"
+            :label="item.name"
+            :value="item.subSystemId">
+          </el-option>
+        </el-select>
+      </el-form-item>
+
 			<el-form-item>
 				<el-input v-model="filters.name" placeholder="名称"></el-input>
 			</el-form-item>
@@ -47,7 +58,7 @@
         :show-overflow-tooltip="true" label="授权标识">
       </el-table-column>
       <el-table-column
-        prop="orderNum" header-align="center" align="center" label="排序">
+        prop="sortNo" header-align="center" align="center" label="排序">
       </el-table-column>
       <el-table-column
         fixed="right" header-align="center" align="center" width="185" label="操作">
@@ -58,7 +69,7 @@
       </el-table-column>
     </el-table>
     <!-- 新增修改界面 -->
-    <el-dialog :title="!dataForm.id ? '新增' : '修改'" width="40%" :visible.sync="dialogVisible" :close-on-click-modal="false">
+    <el-dialog :title="!dataForm.moduleId ? '新增' : '修改'" width="40%" :visible.sync="dialogVisible" :close-on-click-modal="false">
       <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="submitForm()" 
         label-width="80px" :size="size" style="text-align:left;">
         <el-form-item label="菜单类型" prop="type">
@@ -95,8 +106,8 @@
             </el-col>
           </el-row>
         </el-form-item>
-        <el-form-item v-if="dataForm.type !== 2" label="排序编号" prop="orderNum">
-          <el-input-number v-model="dataForm.orderNum" controls-position="right" :min="0" label="排序编号"></el-input-number>
+        <el-form-item v-if="dataForm.type !== 2" label="排序编号" prop="sortNo">
+          <el-input-number v-model="dataForm.sortNo" controls-position="right" :min="0" label="排序编号"></el-input-number>
         </el-form-item>
         <el-form-item v-if="dataForm.type !== 2" label="菜单图标" prop="icon">
           <el-row>
@@ -122,6 +133,7 @@ import KtButton from "@/components/KtButton";
 import TableTreeColumn from "@/components/TableTreeColumn";
 import PopupTreeInput from "@/components/PopupTreeInput";
 import FaIconTooltip from "@/components/FaIconTooltip";
+import Util from "../../common/util.js";
 export default {
   components: {
     PopupTreeInput,
@@ -136,19 +148,20 @@ export default {
       filters: {
         name: ""
       },
+      subSystems:[],//子系统
       tableTreeDdata: [],
       dialogVisible: false,
       moduleTypeList: ["目录", "菜单", "按钮"],
       dataForm: {
-        id: 0,
         type: 1,
         name: "",
         parentId: 0,
         parentName: "",
         url: "",
-        perms: "",
-        orderNum: 0,
+        permission: "",
+        sortNo: 0,
         icon: "",
+        subSystemId:"",
         iconList: []
       },
       dataRule: {
@@ -163,9 +176,9 @@ export default {
   },
   methods: {
     // 获取数据
-    findTreeData: function() {
+    findTreeData: function(subSystemId) {
       this.loading = true;
-      this.$api.module.fetchTree().then(res => {
+      this.$api.module.fetchTree(subSystemId).then(res => {
         this.tableTreeDdata = res.data;
         this.popupTreeData = this.getParentMenuTree(res.data);
         this.loading = false;
@@ -183,19 +196,6 @@ export default {
     // 显示新增界面
     handleAdd: function() {
       this.dialogVisible = true;
-      this.dataForm = {
-        id: 0,
-        type: 1,
-        typeList: ["目录", "菜单", "按钮"],
-        name: "",
-        parentId: 0,
-        parentName: "",
-        url: "",
-        perms: "",
-        orderNum: 0,
-        icon: "",
-        iconList: []
-      };
     },
     // 显示编辑界面
     handleEdit: function(row) {
@@ -216,7 +216,7 @@ export default {
     },
     // 获取删除的包含子菜单的id列表
     getDeleteIds(ids, row) {
-      ids.push({ id: row.id });
+      ids.push({ id: row.moduleId });
       if (row.children != null) {
         for (let i = 0, len = row.children.length; i < len; i++) {
           this.getDeleteIds(ids, row.children[i]);
@@ -226,7 +226,7 @@ export default {
     },
     // 菜单树选中
     handleTreeSelectChange(data, node) {
-      this.dataForm.parentId = data.id;
+      this.dataForm.parentId = data.moduleId;
       this.dataForm.parentName = data.name;
     },
     // 图标选中
@@ -237,30 +237,42 @@ export default {
     submitForm() {
       this.$refs["dataForm"].validate(valid => {
         if (valid) {
-          this.$confirm("确认提交吗？", "提示", {}).then(() => {
             this.editLoading = true;
-            let params = Object.assign({}, this.dataForm);
-            this.$api.module.save(params).then(res => {
-              this.editLoading = false;
-              if (res.code == 200) {
-                this.$message({ message: "操作成功", type: "success" });
-                this.$refs["dataForm"].resetFields();
-                this.dialogVisible = false;
-              } else {
-                this.$message({
-                  message: "操作失败, " + res.msg,
-                  type: "error"
-                });
-              }
-              this.findTreeData();
-            });
-          });
+            let { moduleId,type,name,parentId,url,permission,sortNo,icon,subSystemId} = this.dataForm;
+            let params = {moduleId, type,name,parentId,url,permission,sortNo,icon,subSystemId};
+            Util.clean(params);
+            if(!params.moduleId){
+              this.$api.module.create(params).then(Util.response).then(this.onCreate).catch(Util.error);
+            }else{
+              this.$api.module.update(params).then(Util.response).then(this.onUpdate).catch(Util.error);
+            }
         }
       });
+    },
+    onCreate(result){
+      this.editLoading = false;
+      //this.$refs["dataForm"].resetFields();
+      //this.dialogVisible = false;
+      this.findTreeData(this.dataForm.subSystemId);
+      Util.message("新增成功");
+    },
+    onUpdate(result){
+      this.editLoading = false;
+      //this.$refs["dataForm"].resetFields();
+      //this.dialogVisible = false;
+      this.findTreeData(this.dataForm.subSystemId);
+      Util.message("修改成功");
+    },
+    getSubSystem(){
+      let params = Util.stringify({page:1,size:100});
+      this.$api.subSystem.findAll(params).then(Util.response).then(this.onSubSystem).catch(Util.error);
+    },
+    onSubSystem(result){
+      this.subSystems = result.data.content;
     }
   },
   mounted() {
-    //this.findTreeData();
+    this.getSubSystem();
   }
 };
 </script>

@@ -12,6 +12,9 @@ export default {
   findByOrganization: params => {
     return axios({url:`/api/sub-system/find-by-organization/${params}`,method:'get', data: params})
   },
+  findAll: params => {
+    return axios({url:`/api/sub-system/find-all`,method:'post', data: params})
+  },
   //修改个人信息
   update: params => {
     return axios({url:'/api/sub-system/update',method:'post',data: params})
