@@ -16,8 +16,7 @@
 </template>
 
 <script>
-  import API from '../api/api_user';
-
+import Cookies from "js-cookie"
   export default {
     data() {
       return {
@@ -46,14 +45,19 @@
           if (valid) {
             this.loading = true;
             let loginParams = {accountCode: this.account.username, password: this.account.pwd};
-            API.login(loginParams).then(function (result) {
+            this.$api.user.login(loginParams).then(function (result) {
               that.loading = false;
               if (result && result.data) {
-                localStorage.setItem('access-user', JSON.stringify(result));
+                 localStorage.setItem('token', JSON.stringify(result));
 //                that.$store.commit('SET_ROUTERS', user.permissions)
 //                that.$router.addRoutes(that.$store.getters.addRouters);
 //                that.$router.options.routes = that.$store.getters.routers;
-                that.$router.push({path: '/'});
+                  Cookies.set('token', JSON.stringify(result)) // 放置token到Cookie
+            // sessionStorage.setItem('user', userInfo.account) // 保存用户到本地会话
+            // this.$store.commit('menuRouteLoaded', false) // 要求重新加载导航菜单
+            // this.$router.push('/')  // 登录成功，跳转到主页
+
+               that.$router.push({path: '/'});
               } else {
                 that.$message.error({showClose: true, message: result.errmsg || '登录失败', duration: 2000});
               }

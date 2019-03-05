@@ -40,7 +40,6 @@
   </el-dialog>
 </template>
 <script>
-import API from "../../api/api_organization";
 import Util from "../../common/util.js";
 
 export default {
@@ -97,7 +96,7 @@ export default {
         that.organization.parentId = that.parent.organizationId;
       }
       // that.loading = true;
-      API.create(that.organization)
+      this.$api.organization.create(that.organization)
         .then(Util.response)
         .then(that.onCreate)
         .catch(Util.error);
@@ -124,7 +123,7 @@ export default {
         }
         that.doUpdate();
         // that.loading = true;
-        // API.update(param).then(function (result) {
+        // this.$api.organization.update(param).then(function (result) {
         //     // that.loading = false;
         //     if(result.status == 'success'){
         //       that.$message.success({showClose: true, message: '更新成功', duration: 2000});
@@ -152,7 +151,7 @@ export default {
       } else {
         param.isLeaf = "0";
       }
-      API.update(param)
+      this.$api.organization.update(param)
         .then(Util.response)
         .then(that.onModify)
         .catch(Util.error);

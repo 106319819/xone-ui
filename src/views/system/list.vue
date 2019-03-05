@@ -1,36 +1,36 @@
 <template>
   <el-row class="warp">
-    <edit-person-dialog
-      ref="edit-person-dialog"
-      title="修改组织人员"
+    <edit-sub-system-dialog
+      ref="edit-sub-system-dialog"
+      title="修改组织子系统"
       :modify="true"
-      :person="dialogs.person"
+      :subSystem="dialogs.subSystem"
       :organization="dialogs.organization"
       v-on:onModify="onModify"
       v-if="dialogs.editDialogVisible"
       :visible.sync="dialogs.editDialogVisible"
-    ></edit-person-dialog>
-    <add-person-dialog
-      ref="add-person-dialog"
-      title="新增组织人员"
+    ></edit-sub-system-dialog>
+    <add-sub-system-dialog
+      ref="add-sub-system-dialog"
+      title="新增组织子系统"
       :modify="false"
-      :person="dialogs.person"
+      :subSystem="dialogs.subSystem"
       :organization="dialogs.organization"
-      v-on:onCreatePerson="onCreatePerson"
+      v-on:onCreateSubSystem="onCreateSubSystem"
       v-if="dialogs.addChildVisible"
       :visible.sync="dialogs.addChildVisible"
-    ></add-person-dialog>
+    ></add-sub-system-dialog>
     <el-col :span="24" class="warp-breadcrum">
       <el-breadcrumb separator="/">
         <el-breadcrumb-item :to="{ path: '/' }">
           <b>首页</b>
         </el-breadcrumb-item>
-        <el-breadcrumb-item>组织人员管理</el-breadcrumb-item>
+        <el-breadcrumb-item>组织子系统管理</el-breadcrumb-item>
       </el-breadcrumb>
     </el-col>
     <el-row>
       <el-col :span="6">
-        <el-button @click="onAddPerson('add-person-dialog')" :disabled="buttons.disabled">新增组织人员</el-button>
+        <el-button @click="onAddSubSystem('add-sub-system-dialog')" :disabled="buttons.disabled">新增组织子系统</el-button>
       </el-col>
       <el-col :span="18">
         <!--工具条-->
@@ -80,7 +80,7 @@
       </el-col>
       <el-col :span="18">
         <el-table
-          :data="persons"
+          :data="subSystems"
           highlight-current-row
           @selection-change="onSelection"
           v-loading="loading"
@@ -90,25 +90,15 @@
           <!-- <el-table-column type="index" width="60"></el-table-column> -->
           <el-table-column label="操作" width="150">
             <template slot-scope="scope">
-              <el-button @click="onModifyButton('add-person-dialog',scope.$index,scope.row)">修改</el-button>
-              <el-button @click="onDeletePerson(scope.$index,scope.row)">删除</el-button>
+              <el-button @click="onModifyButton('add-sub-system-dialog',scope.$index,scope.row)">修改</el-button>
+              <el-button @click="onDeleteSubSystem(scope.$index,scope.row)">删除</el-button>
             </template>
           </el-table-column>
 
-          <el-table-column prop="personId" label="ID"  sortable></el-table-column>
-          <el-table-column prop="personCode" label="编码" sortable></el-table-column>
-          <el-table-column prop="firstName" label="姓" sortable></el-table-column>
-          <el-table-column prop="lastName" label="名" sortable></el-table-column>
-          <el-table-column prop="fullName" label="全名" sortable></el-table-column>
-          <el-table-column prop="birthday" label="出生日期" sortable></el-table-column>
-          <el-table-column prop="mobile" label="手机" sortable></el-table-column>
-          <el-table-column prop="email" label="邮箱" sortable></el-table-column>
-          
-          <el-table-column prop="sex" label="性别" :formatter="formatSex" sortable></el-table-column>
-          <!-- <el-table-column prop="organizationCode" label="编码" min-width="160" sortable></el-table-column>
-          <el-table-column prop="level" label="层级" sortable></el-table-column>
-          <el-table-column prop="parentId" label="上级" sortable></el-table-column>
-          <el-table-column prop="sortNo" label="排序" sortable></el-table-column> -->
+          <el-table-column prop="subSystemId" label="ID"  sortable></el-table-column>
+          <el-table-column prop="code" label="编码" sortable></el-table-column>
+          <el-table-column prop="name" label="名称" sortable></el-table-column>
+          <el-table-column prop="status" label="状态" :formatter="formatStatus" sortable></el-table-column>
           <el-table-column prop="comment" label="备注" sortable></el-table-column>
         </el-table>
       </el-col>
@@ -117,8 +107,6 @@
 </template>
 
 <script>
-import API from "../../api/api_organization";
-import PersonAPI from "../../api/api_person";
 import Dialog from "./dialog-form.vue";
 import Util from "../../common/util.js";
 export default {
@@ -136,14 +124,14 @@ export default {
       dialogs: {
         addChildVisible: false,
         editDialogVisible: false,
-        person: {account:{accountCode:'',password:''}},
+        subSystem: {},
         organization: {}
       },
       filters: {
         name: ""
       },
       loading: false,
-      persons: [],
+      subSystems: [],
       total: 0,
       page: 1,
       limit: 10,
@@ -152,8 +140,10 @@ export default {
   },
   methods: {
     //性别显示转换
-    formatSex: function(row, column) {
-      return row.sex == 'M' ? "男" : row.sex == 'W' ? "女" : '-';
+    formatStatus: function(row, column) {
+      //0停用 1启用 2禁用 3删除
+      let statusMap = {"0":"停用", "1":"启用", "2":"禁用", "3":"删除"};
+      return statusMap[row.status];
     },
 
     disable() {
@@ -167,12 +157,12 @@ export default {
       if (node.data && node.data.organizationId) {
         parentId = node.data.organizationId;
       }
-      API.findByParent(parentId)
+      that.$api.organization.findByParent(parentId)
         .then(Util.response)
         .then(that.doLoadNode)
         .then(resolve)
         .catch(Util.error);
-      // API.findByParent(parentId).then(function(result) {
+      // that.$api.organization.findByParent(parentId).then(function(result) {
       //   if (result.status == "success") {
       //     let data = result.data;
       //     data.forEach(function(value, index) {
@@ -213,7 +203,7 @@ export default {
       };
 
       that.loading = true;
-      API.findList(params)
+      that.$api.organization.findList(params)
         .then(
           function(result) {
             that.loading = false;
@@ -247,13 +237,13 @@ export default {
 
       let that = this;
       this.disable();
-      PersonAPI.findByOrganization(data.organizationId).then(function(result) {
+      that.$api.subSystem.findByOrganization(data.organizationId).then(function(result) {
         if (result.status == "success") {
-          that.persons = result.data;
+          that.subSystems = result.data;
         }
       });
     },
-    onAddPerson(dialog) {
+    onAddSubSystem(dialog) {
       this.dialogs.addChildVisible = true;
       this.dialogs.organization = this.$refs["tree"].getCurrentNode();
 
@@ -261,7 +251,7 @@ export default {
       //   this.$refs[dialog].init(node.data);
       // }
     },
-    onCreatePerson(child) {
+    onCreateSubSystem(child) {
       //this.$refs.tree.getCurrentNode()
       let parent = this.$refs.tree.getCurrentNode();
       this.$refs.tree.append(child, parent);
@@ -273,7 +263,7 @@ export default {
       this.dialogs.editDialogVisible = true;
       //let organization = this.$refs.tree.getCurrentNode();
       //this.dialogs.organization = organization;
-      this.dialogs.person = row;
+      this.dialogs.subSystem = row;
       let organization = this.$refs.tree.getCurrentNode();
       this.dialogs.organization = organization;
     },
@@ -281,28 +271,28 @@ export default {
       console.log("onModify");
       console.log(data);
     },
-    onDeletePerson(index, row){
+    onDeleteSubSystem(index, row){
       let that = this;
       //function(action, instance)，action 的值为'confirm', 'cancel'或'close', instance 为 MessageBox 实例
       Util.confirm(`确认删除 ${row.fullName} ?`,row)
-        .then(that.doDeletePerson)
+        .then(that.doDeleteSubSystem)
         .catch(action => {});
     },
-    doDeletePerson(row) {
+    doDeleteSubSystem(row) {
       //Util.alert(`${row.fullName}`);
       // let organization = this.$refs.tree.getCurrentNode();
-       PersonAPI.delete(row.personId)
+       that.$api.subSystem.delete(row.subSystemId)
         .then(Util.response)
         .then(this.onDeleteNode)
         .catch(Util.error);
     },
     onDeleteNode(result) {
-      let personId = result.data;
-      for (let i = 0; i < this.persons.length; i++) {
-          let item = this.persons[i];
-          if (personId == item.personId) {
+      let subSystemId = result.data;
+      for (let i = 0; i < this.subSystems.length; i++) {
+          let item = this.subSystems[i];
+          if (subSystemId == item.subSystemId) {
             //删除表格对应数组元素
-            this.persons.splice(i, 1);
+            this.subSystems.splice(i, 1);
             break;
           }
         }
@@ -319,8 +309,8 @@ export default {
     },
     doBatchDelete(selections) {
       let that = this;
-      let params = selections.map(item => item.personId).toString();
-      PersonAPI.deleteBatch(params.split(","))
+      let params = selections.map(item => item.subSystemId).toString();
+      that.$api.subSystem.deleteBatch(params.split(","))
         .then(Util.response)
         .then(that.onBatchDelete)
         .catch(Util.error);
@@ -328,11 +318,11 @@ export default {
     onBatchDelete(result) {
       let ids = result.data;
       ids.forEach(value => {
-        for (let i = 0; i < this.persons.length; i++) {
-          let item = this.persons[i];
-          if (value == item.personId) {
+        for (let i = 0; i < this.subSystems.length; i++) {
+          let item = this.subSystems[i];
+          if (value == item.subSystemId) {
             //删除表格对应数组元素
-            this.persons.splice(i, 1);
+            this.subSystems.splice(i, 1);
             break;
           }
         }
@@ -346,8 +336,8 @@ export default {
     //this.findByParent(0);
   },
   components: {
-    "add-person-dialog": Dialog,
-    "edit-person-dialog": Dialog
+    "add-sub-system-dialog": Dialog,
+    "edit-sub-system-dialog": Dialog
   }
 };
 </script>
