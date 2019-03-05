@@ -1,19 +1,19 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Home from '@/components/Home'
-import Dashboard from '@/components/Dashboard'
+import Home from '@/views/Home'
+import Dashboard from '@/views/Dashboard'
 
-import BookList from '@/components/book/list'
-import BookCategoryList from '@/components/bookcategory/list'
+import SubSystemList from '@/views/system/list'
 
-import PersonList from '@/components/person/list'
-import UserChangePwd from '@/components/person/changepwd'
+import PersonList from '@/views/person/list'
+import UserChangePwd from '@/views/person/changepwd'
 
-import OrganizationList from '@/components/organization/list'
-import OrganizationEdit from '@/components/organization/edit-form'
+import OrganizationList from '@/views/organization/list'
+import OrganizationEdit from '@/views/organization/edit-form'
 
+import ModuleList from '@/views/module/list'
 // 懒加载方式，当路由被访问的时候才加载对应组件
-const Login = resolve => require(['@/components/Login'], resolve)
+const Login = resolve => require(['@/views/Login'], resolve)
 
 Vue.use(Router)
 
@@ -40,23 +40,44 @@ let router = new Router({
     {
       path: '/',
       component: Home,
-      name: '用户管理',
+      name: '组织管理',
       menuShow: true,
-      leaf: true, // 只有一个节点
-      iconCls: 'iconfont icon-qunzu_o', // 图标样式class
+      iconCls: 'iconfont icon-shuzhuangtu_o', // 图标样式class
       children: [
-        {path: '/person/list', component: PersonList, name: '用户列表', menuShow: true}
+        {path: '/organization/list', component: OrganizationList, name: '组织列表', menuShow: true},
+        {path:'/organization/edit',component:OrganizationEdit,name:'组织编辑', menuShow: true}
       ]
     },
     {
       path: '/',
       component: Home,
-      name: '图书管理',
+      name: '人员管理',
+      menuShow: true,
+      leaf: true, // 只有一个节点
+      iconCls: 'iconfont icon-qunzu_o', // 图标样式class
+      children: [
+        {path: '/person/list', component: PersonList, name: '人员列表', menuShow: true}
+      ]
+    },    
+    {
+      path: '/',
+      component: Home,
+      name: '模块管理',
+      menuShow: true,
+      leaf: true, // 只有一个节点
+      iconCls: 'iconfont icon-qunzu_o', // 图标样式class
+      children: [
+        {path: '/module/list', component: ModuleList, name: '模块列表', menuShow: true}
+      ]
+    },
+    {
+      path: '/',
+      component: Home,
+      name: '子系统管理',
       menuShow: true,
       iconCls: 'iconfont icon-shu_o',
       children: [
-        {path: '/book/list', component: BookList, name: '图书列表', menuShow: true},
-        {path: '/book/category', component: BookCategoryList, name: '图书分类', menuShow: true}
+        {path: '/system/list', component: SubSystemList, name: '子系统管理', menuShow: true},
       ]
     },
     {
@@ -69,27 +90,18 @@ let router = new Router({
         {path: '/person/list', component: PersonList, name: '个人信息', menuShow: true},
         {path: '/person/changepwd', component: UserChangePwd, name: '修改密码', menuShow: true}
       ]
-    },{
-      path: '/',
-      component: Home,
-      name: '组织管理',
-      menuShow: true,
-      iconCls: 'iconfont icon-shuzhuangtu_o', // 图标样式class
-      children: [
-        {path: '/organization/list', component: OrganizationList, name: '组织列表', menuShow: true},
-        {path:'/organization/edit',component:OrganizationEdit,name:'组织编辑', menuShow: true}
-      ]
     },
   ]
 })
 
 router.beforeEach((to, from, next) => {
   // console.log('to:' + to.path)
+  // 登录界面登录成功之后，会把用户信息保存在会话
   if (to.path.startsWith('/login')) {
-    window.localStorage.removeItem('access-user')
+    window.localStorage.removeItem('token')
     next()
   } else {
-    let user = JSON.parse(window.localStorage.getItem('access-user'))
+    let user = JSON.parse(window.localStorage.getItem('token'))
     if (!user) {
       next({path: '/login'})
     } else {

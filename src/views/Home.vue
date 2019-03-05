@@ -71,22 +71,20 @@
 </template>
 
 <script>
-  import {bus} from '../bus.js'
-  import API from '../api/api_user';
 
   export default {
     name: 'home',
     created(){
-      bus.$on('setNickName', (text) => {
-        this.nickname = text;
-      })
+      // this.$api.$on('setNickName', (text) => {
+      //   this.nickname = text;
+      // })
 
-      bus.$on('goto', (url) => {
-        if (url === "/login") {
-          localStorage.removeItem('access-user');
-        }
-        this.$router.push(url);
-      })
+      // this.$api.$on('goto', (url) => {
+      //   if (url === "/login") {
+      //     localStorage.removeItem('token');
+      //   }
+      //   this.$router.push(url);
+      // })
     },
     data () {
       return {
@@ -114,9 +112,9 @@
         }).then(() => {
           //确认
           that.loading = true;
-          API.logout().then(function (result) {
+          this.$api.user.logout().then(function (result) {
             that.loading = false;
-            localStorage.removeItem('access-user');
+            localStorage.removeItem('token');
             that.$router.go('/login'); //用go刷新
           }, function (err) {
             that.loading = false;
@@ -130,7 +128,7 @@
       }
     },
     mounted() {
-      let user = localStorage.getItem('access-user');
+      let user = localStorage.getItem('token');
       if (user) {
         user = JSON.parse(user);
         this.nickname = user.nickname || '';

@@ -11,36 +11,18 @@
   >
     <el-row class="warp">
       <el-col :span="24" class="warp-main">
-        <el-form ref="form" :model="person" :rules="validate" label-width="120px">
-          <el-form-item label="姓">
-            <el-input v-model="person.firstName"></el-input>
+        <el-form ref="form" :model="subSystem" :rules="validate" label-width="120px">
+          <el-form-item label="名称">
+            <el-input v-model="subSystem.name"></el-input>
           </el-form-item>
-          <el-form-item label="名">
-            <el-input v-model="person.lastName"></el-input>
-          </el-form-item>
-          
-          <el-form-item label="账号">
-            <el-input v-model="person.account.accountCode"></el-input>
-          </el-form-item>
-          
-          <el-form-item label="密码">
-            <el-input v-model="person.account.password"></el-input>
-          </el-form-item>
-
           <el-form-item label="编码">
-            <el-input v-model="person.personCode"></el-input>
-          </el-form-item>
-          <el-form-item label="手机">
-            <el-input v-model="person.mobile"></el-input>
-          </el-form-item>
-          <el-form-item label="邮箱">
-            <el-input v-model="person.email"></el-input>
+            <el-input v-model="subSystem.code"></el-input>
           </el-form-item>
           <el-form-item label="组织">
             <el-input :value="organization.organizationName"></el-input>
           </el-form-item>
           <el-form-item label="备注">
-            <el-input v-model="person.comment"></el-input>
+            <el-input v-model="subSystem.comment"></el-input>
           </el-form-item>
         </el-form>
       </el-col>
@@ -52,34 +34,23 @@
   </el-dialog>
 </template>
 <script>
-import API from "../../api/api_person";
 import Util from "../../common/util.js";
 
 export default {
   props: {
     visible: { type: Boolean, default: false },
     title: { type: String, default: "hi" },
-    person: { type: Object, default: {} },
+    subSystem: { type: Object, default: {} },
     modify: { type: Boolean, default: false },
     organization: { type: Object, default: {} }
   },
   data() {
     return {
-      // organization: {
-      //   organizationName: '',
-      //   organizationNameEn: '',
-      //   organizationCode:'',
-      //   sortNo: 0,
-      //   parentId:0,
-      //   comment:''
-      // },
-      //title:'t-title',
-      //parent:{},
       validate: {
-        firstName: [
+        name: [
           { required: true, message: "请输入姓", trigger: "blur" }
         ],
-        personCode: [
+        code: [
           { required: true, message: "请输入编码", trigger: "blur" }
         ]
       }
@@ -106,17 +77,16 @@ export default {
     doCreate() {
       let that = this;
       if (that.organization.organizationId) {
-        that.person.organizationId = that.organization.organizationId;
+        that.subSystem.organizationId = that.organization.organizationId;
       }
-      that.person.fullName = that.person.firstName + that.person.lastName;
       // that.loading = true;
-      API.create(that.person)
+      that.$api.subSystem.create(that.subSystem)
         .then(Util.response)
         .then(that.onCreate)
         .catch(Util.error);
     },
     onCreate(result) {
-      this.$emit("onCreatePerson", result.data);
+      this.$emit("onCreateSubSystem", result.data);
       Util.message("新增成功！");
     },
     update() {
@@ -130,7 +100,7 @@ export default {
     },
     doUpdate() {
       let that = this;      
-      API.update(that.person)
+      that.$api.subSystem.update(that.subSystem)
         .then(Util.response)
         .then(that.onModify)
         .catch(Util.error);

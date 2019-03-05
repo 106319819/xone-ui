@@ -1,38 +1,36 @@
 <template>
   <el-row class="warp">
-    <edit-dialog
-      ref="edit-dialog"
-      title="修改"
+    <edit-person-dialog
+      ref="edit-person-dialog"
+      title="修改组织人员"
       :modify="true"
+      :person="dialogs.person"
       :organization="dialogs.organization"
-      :parent="dialogs.parent"
       v-on:onModify="onModify"
       v-if="dialogs.editDialogVisible"
       :visible.sync="dialogs.editDialogVisible"
-    ></edit-dialog>
-    <add-child-dialog
-      ref="add-child-dialog"
-      title="新增子组织"
+    ></edit-person-dialog>
+    <add-person-dialog
+      ref="add-person-dialog"
+      title="新增组织人员"
       :modify="false"
-      :organization="{}"
-      :parent="dialogs.parent"
-      v-on:onCreateChild="onCreateChild"
+      :person="dialogs.person"
+      :organization="dialogs.organization"
+      v-on:onCreatePerson="onCreatePerson"
       v-if="dialogs.addChildVisible"
       :visible.sync="dialogs.addChildVisible"
-    ></add-child-dialog>
+    ></add-person-dialog>
     <el-col :span="24" class="warp-breadcrum">
       <el-breadcrumb separator="/">
         <el-breadcrumb-item :to="{ path: '/' }">
           <b>首页</b>
         </el-breadcrumb-item>
-        <el-breadcrumb-item>组织管理</el-breadcrumb-item>
+        <el-breadcrumb-item>组织人员管理</el-breadcrumb-item>
       </el-breadcrumb>
     </el-col>
     <el-row>
       <el-col :span="6">
-        <el-button @click="onAdd">新增组织</el-button>
-        <el-button @click="onAddChild('add-child-dialog')" :disabled="buttons.disabled">新增子组织</el-button>
-        <el-button @click="onModifyNode('add-child-dialog')" :disabled="buttons.disabled">修改</el-button>
+        <el-button @click="onAddPerson('add-person-dialog')" :disabled="buttons.disabled">新增组织人员</el-button>
       </el-col>
       <el-col :span="18">
         <!--工具条-->
@@ -82,7 +80,7 @@
       </el-col>
       <el-col :span="18">
         <el-table
-          :data="organizations"
+          :data="persons"
           highlight-current-row
           @selection-change="onSelection"
           v-loading="loading"
@@ -92,20 +90,21 @@
           <!-- <el-table-column type="index" width="60"></el-table-column> -->
           <el-table-column label="操作" width="150">
             <template slot-scope="scope">
-              <el-button @click="onModifyButton('add-child-dialog',scope.$index,scope.row)">修改</el-button>
-              <el-button @click="onDeleteOrganization(scope.$index,scope.row)">删除</el-button>
+              <el-button @click="onModifyButton('add-person-dialog',scope.$index,scope.row)">修改</el-button>
+              <el-button @click="onDeletePerson(scope.$index,scope.row)">删除</el-button>
             </template>
           </el-table-column>
 
-          <el-table-column prop="organizationId" label="编码"  sortable></el-table-column>
-          <el-table-column prop="organizationName" label="名称" sortable></el-table-column>
-          <el-table-column
-            prop="organizationNameEn"
-            label="英文名称"
-            width="100"
-            :formatter="formatSex"
-            sortable
-          ></el-table-column>
+          <el-table-column prop="personId" label="ID"  sortable></el-table-column>
+          <el-table-column prop="personCode" label="编码" sortable></el-table-column>
+          <el-table-column prop="firstName" label="姓" sortable></el-table-column>
+          <el-table-column prop="lastName" label="名" sortable></el-table-column>
+          <el-table-column prop="fullName" label="全名" sortable></el-table-column>
+          <el-table-column prop="birthday" label="出生日期" sortable></el-table-column>
+          <el-table-column prop="mobile" label="手机" sortable></el-table-column>
+          <el-table-column prop="email" label="邮箱" sortable></el-table-column>
+          
+          <el-table-column prop="sex" label="性别" :formatter="formatSex" sortable></el-table-column>
           <!-- <el-table-column prop="organizationCode" label="编码" min-width="160" sortable></el-table-column>
           <el-table-column prop="level" label="层级" sortable></el-table-column>
           <el-table-column prop="parentId" label="上级" sortable></el-table-column>
@@ -118,7 +117,6 @@
 </template>
 
 <script>
-import API from "../../api/api_organization";
 import Dialog from "./dialog-form.vue";
 import Util from "../../common/util.js";
 export default {
@@ -136,14 +134,14 @@ export default {
       dialogs: {
         addChildVisible: false,
         editDialogVisible: false,
-        parent: {},
+        person: {account:{accountCode:'',password:''}},
         organization: {}
       },
       filters: {
         name: ""
       },
       loading: false,
-      organizations: [],
+      persons: [],
       total: 0,
       page: 1,
       limit: 10,
@@ -153,10 +151,7 @@ export default {
   methods: {
     //性别显示转换
     formatSex: function(row, column) {
-      return row.sex == 1 ? "男" : row.sex == 0 ? "女" : row.organizationNameEn;
-    },
-    onAdd() {
-      this.$router.push("/organization/edit");
+      return row.sex == 'M' ? "男" : row.sex == 'W' ? "女" : '-';
     },
 
     disable() {
@@ -170,12 +165,12 @@ export default {
       if (node.data && node.data.organizationId) {
         parentId = node.data.organizationId;
       }
-      API.findByParent(parentId)
+     that.$api.organization.findByParent(parentId)
         .then(Util.response)
         .then(that.doLoadNode)
         .then(resolve)
         .catch(Util.error);
-      // API.findByParent(parentId).then(function(result) {
+      //that.$api.organization.findByParent(parentId).then(function(result) {
       //   if (result.status == "success") {
       //     let data = result.data;
       //     data.forEach(function(value, index) {
@@ -216,7 +211,7 @@ export default {
       };
 
       that.loading = true;
-      API.findList(params)
+     that.$api.organization.findList(params)
         .then(
           function(result) {
             that.loading = false;
@@ -250,20 +245,21 @@ export default {
 
       let that = this;
       this.disable();
-      API.findByParent(data.organizationId).then(function(result) {
+      that.$api.person.findByOrganization(data.organizationId).then(function(result) {
         if (result.status == "success") {
-          that.organizations = result.data;
+          that.persons = result.data;
         }
       });
     },
-    onAddChild(dialog) {
+    onAddPerson(dialog) {
       this.dialogs.addChildVisible = true;
-      this.dialogs.parent = this.$refs["tree"].getCurrentNode();
-      if (this.$refs[dialog]) {
-        this.$refs[dialog].init(node.data);
-      }
+      this.dialogs.organization = this.$refs["tree"].getCurrentNode();
+
+      // if (this.$refs[dialog]) {
+      //   this.$refs[dialog].init(node.data);
+      // }
     },
-    onCreateChild(child) {
+    onCreatePerson(child) {
       //this.$refs.tree.getCurrentNode()
       let parent = this.$refs.tree.getCurrentNode();
       this.$refs.tree.append(child, parent);
@@ -271,65 +267,58 @@ export default {
       node.expand();
       //this.loadNode()
     },
-    onModifyNode(dialog) {
-      this.dialogs.editDialogVisible = true;
-      let organization = this.$refs.tree.getCurrentNode();
-      this.dialogs.organization = organization;
-      let node = this.$refs.tree.getNode(organization);
-      this.dialogs.parent = node.parent.data;
-    },
     onModifyButton(dialog, index, row) {
       this.dialogs.editDialogVisible = true;
       //let organization = this.$refs.tree.getCurrentNode();
       //this.dialogs.organization = organization;
-      this.dialogs.organization = row;
-      let node = this.$refs.tree.getNode(row.organizationId);
-      this.dialogs.parent = node.parent.data;
+      this.dialogs.person = row;
+      let organization = this.$refs.tree.getCurrentNode();
+      this.dialogs.organization = organization;
     },
     onModify(data) {
       console.log("onModify");
       console.log(data);
     },
-    onDeleteOrganization(index, row){},
-    onDelete() {
+    onDeletePerson(index, row){
       let that = this;
-      let organization = this.$refs.tree.getCurrentNode();
       //function(action, instance)，action 的值为'confirm', 'cancel'或'close', instance 为 MessageBox 实例
-      Util.confirm(`确认删除 ${organization.organizationName} 及其孩子节点吗?`)
-        .then(that.doDeleteNode)
+      Util.confirm(`确认删除 ${row.fullName} ?`,row)
+        .then(that.doDeletePerson)
         .catch(action => {});
     },
-    doDeleteNode() {
-      let organization = this.$refs.tree.getCurrentNode();
-      API.delete(organization.organizationId)
+    doDeletePerson(row) {
+      //Util.alert(`${row.fullName}`);
+      // let organization = this.$refs.tree.getCurrentNode();
+       that.$api.person.delete(row.personId)
         .then(Util.response)
         .then(this.onDeleteNode)
         .catch(Util.error);
     },
     onDeleteNode(result) {
-      let organizationId = result.data;
-      let organization = this.$refs.tree.getCurrentNode();
-      let children = [];
-      organization.children.forEach((item, index) => {
-        children.push(item.organizationId);
-      });
-      result.data = children;
-      this.onBatchDelete(result);
-      this.$refs.tree.remove(organizationId);
+      let personId = result.data;
+      for (let i = 0; i < this.persons.length; i++) {
+          let item = this.persons[i];
+          if (personId == item.personId) {
+            //删除表格对应数组元素
+            this.persons.splice(i, 1);
+            break;
+          }
+        }
+        
     },
     onSelection(selections) {
       this.selections = selections;
     },
     //批量删除
     batchDelete() {
-      Util.confirm("确认删除选中记录吗？")
+      Util.confirm("确认删除选中记录吗？",this.selections)
         .then(this.doBatchDelete)
         .catch(action => {});
     },
-    doBatchDelete(action) {
+    doBatchDelete(selections) {
       let that = this;
-      let params = that.selections.map(item => item.organizationId).toString();
-      API.deleteBatch(params.split(","))
+      let params = selections.map(item => item.personId).toString();
+      that.$api.person.deleteBatch(params.split(","))
         .then(Util.response)
         .then(that.onBatchDelete)
         .catch(Util.error);
@@ -337,13 +326,11 @@ export default {
     onBatchDelete(result) {
       let ids = result.data;
       ids.forEach(value => {
-        for (let i = 0; i < this.organizations.length; i++) {
-          let item = this.organizations[i];
-          if (value == item.organizationId) {
+        for (let i = 0; i < this.persons.length; i++) {
+          let item = this.persons[i];
+          if (value == item.personId) {
             //删除表格对应数组元素
-            this.organizations.splice(i, 1);
-            //同步删除树节点
-            this.$refs["tree"].remove(value);
+            this.persons.splice(i, 1);
             break;
           }
         }
@@ -357,8 +344,8 @@ export default {
     //this.findByParent(0);
   },
   components: {
-    "add-child-dialog": Dialog,
-    "edit-dialog": Dialog
+    "add-person-dialog": Dialog,
+    "edit-person-dialog": Dialog
   }
 };
 </script>

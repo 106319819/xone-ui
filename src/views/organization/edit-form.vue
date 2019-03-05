@@ -37,7 +37,6 @@
   </el-row>
 </template>
 <script>
-  import API from '../../api/api_organization';
   export default{
     data(){
       return {
@@ -68,7 +67,7 @@
           }
           
           that.loading = true;
-          API.create(this.organization).then(function (result) {
+          this.$api.organization.create(this.organization).then(function (result) {
               that.loading = false;
               if(result.status == 'success'){
                 that.$message.success({showClose: true, message: '新增成功', duration: 2000});
