@@ -4,24 +4,17 @@
 	<div class="toolbar" style="float:left;padding-top:10px;padding-left:15px;">
 		<el-form :inline="true" :model="filters" :size="size">
       <el-form-item label="子系统">
-        <el-select v-model="dataForm.subSystemId" placeholder="请选择子系统" @change="findTreeData" >
-          <el-option
-            v-for="item in subSystems"
-            :key="item.subSystemId"
-            :label="item.name"
-            :value="item.subSystemId">
-          </el-option>
-        </el-select>
+        <sub-system-combox v-model="dataForm.subSystemId" @change="findTreeData" ></sub-system-combox>
       </el-form-item>
 
 			<el-form-item>
 				<el-input v-model="filters.name" placeholder="名称"></el-input>
 			</el-form-item>
 			<el-form-item>
-				<kt-button icon="fa fa-search" label="查找" perms="sys:module:view" type="primary" @click="findTreeData(null)"/>
+				<permission-button icon="el-icon-search"  permission="sys:module:view" type="primary" @click="findTreeData(null)">查找</permission-button>
 			</el-form-item>
 			<el-form-item>
-				<kt-button icon="fa fa-plus" label="新增" perms="sys:module:add" type="primary" @click="handleAdd"/>
+				<permission-button icon="el-icon-circle-plus-outline" permission="sys:module:add" type="primary" @click="handleAdd">新增</permission-button>
 			</el-form-item>
 		</el-form>
 	</div>
@@ -42,8 +35,8 @@
       <el-table-column prop="type" header-align="center" align="center" label="类型">
         <template slot-scope="scope">
           <el-tag v-if="scope.row.type === 0" size="small">目录</el-tag>
-          <el-tag v-else-if="scope.row.type === 1" size="small" type="success">菜单</el-tag>
-          <el-tag v-else-if="scope.row.type === 2" size="small" type="info">按钮</el-tag>
+          <el-tag v-else-if="scope.row.type === 1" type="success">菜单</el-tag>
+          <el-tag v-else-if="scope.row.type === 2" type="info">按钮</el-tag>
         </template>
       </el-table-column>
       <el-table-column 
@@ -54,7 +47,7 @@
         :show-overflow-tooltip="true" label="菜单URL">
       </el-table-column>
       <el-table-column
-        prop="perms" header-align="center" align="center" width="150" 
+        prop="permission" header-align="center" align="center" width="150" 
         :show-overflow-tooltip="true" label="授权标识">
       </el-table-column>
       <el-table-column
@@ -63,13 +56,17 @@
       <el-table-column
         fixed="right" header-align="center" align="center" width="185" label="操作">
         <template slot-scope="scope">
-          <kt-button icon="fa fa-edit" label="编辑" perms="sys:module:edit" @click="handleEdit(scope.row)"/>
-          <kt-button icon="fa fa-trash" label="删除" perms="sys:module:delete" type="danger" @click="handleDelete(scope.row)"/>
+          <el-tooltip content="编辑">
+            <permission-button icon="el-icon-edit" type="primary" circle permission="sys:module:edit" @click="handleEdit(scope.row)"/>
+          </el-tooltip>
+          <el-tooltip content="删除">
+          <permission-button icon="el-icon-delete" type="danger" circle permission="sys:module:delete"  @click="handleDelete(scope.row)"/>
+          </el-tooltip>
         </template>
       </el-table-column>
     </el-table>
     <!-- 新增修改界面 -->
-    <el-dialog :title="!dataForm.moduleId ? '新增' : '修改'" width="40%" :visible.sync="dialogVisible" :close-on-click-modal="false">
+    <el-dialog icon="el-icon-menu" :title="!dataForm.moduleId ? '新增' : '修改'" width="40%" :visible.sync="dialogVisible" :close-on-click-modal="false">
       <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="submitForm()" 
         label-width="80px" :size="size" style="text-align:left;">
         <el-form-item label="菜单类型" prop="type">
@@ -86,8 +83,8 @@
               :nodeKey="''+dataForm.parentId" :currentChangeHandle="handleTreeSelectChange">
             </popup-tree-input>
         </el-form-item>
-        <el-form-item v-if="dataForm.type !== 0" label="授权标识" prop="perms">
-          <el-input v-model="dataForm.perms" placeholder="如: sys:user:add, sys:user:edit, sys:user:delete"></el-input>
+        <el-form-item v-if="dataForm.type !== 0" label="授权标识" prop="permission">
+          <el-input v-model="dataForm.permission" placeholder="如: sys:user:add, sys:user:edit, sys:user:delete"></el-input>
         </el-form-item>
         <el-form-item v-if="dataForm.type === 1" label="菜单路由" prop="url">
           <el-row>
@@ -121,26 +118,28 @@
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button :size="size"  @click="dialogVisible = false">取消</el-button>
-        <el-button :size="size"  type="primary" @click="submitForm()">保存</el-button>
+        <el-button icon="el-icon-circle-close-outline"  @click="dialogVisible = false">取消</el-button>
+        <el-button icon="el-icon-circle-check-outline"  type="primary" @click="submitForm()">保存</el-button>
       </span>
     </el-dialog>
   </div>
 </template>
 
 <script>
-import KtButton from "@/components/KtButton";
+import PermissionButton from "../../components/PermissionButton";
 import TableTreeColumn from "@/components/TableTreeColumn";
 import PopupTreeInput from "@/components/PopupTreeInput";
 import FaIconTooltip from "@/components/FaIconTooltip";
 import Util from "../../common/util.js";
+import SubSystemCombox from "../../components/SubSystemCombox";
 
 export default {
   components: {
     PopupTreeInput,
-    KtButton,
+    "permission-button":PermissionButton,
     TableTreeColumn,
-    FaIconTooltip
+    FaIconTooltip,
+    "sub-system-combox":SubSystemCombox
   },
   data() {
     return {

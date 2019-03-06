@@ -66,17 +66,7 @@
 
     <el-row>
       <el-col :span="6">
-        <el-tree
-          :data="tree"
-          :props="props"
-          node-key="organizationId"
-          :load="loadNode"
-          lazy
-          highlight-current
-          @node-click="handleNodeClick"
-          v-loading="loading"
-          ref="tree"
-        ></el-tree>
+        <organization-tree @node-click="handleNodeClick" ref="tree"></organization-tree>
       </el-col>
       <el-col :span="18">
         <el-table
@@ -117,17 +107,13 @@
 </template>
 
 <script>
+import OrganizationTree from "../../components/OrganizationTree"
 import Dialog from "./dialog-form.vue";
 import Util from "../../common/util.js";
 export default {
   data() {
     return {
-      tree: [],
-      props: {
-        children: "children",
-        label: "organizationName",
-        isLeaf: "isLeaf"
-      },
+      
       buttons: {
         disabled: true
       },
@@ -158,39 +144,6 @@ export default {
       let disabled = null == this.$refs.tree.getCurrentNode();
       this.buttons.disabled = disabled;
       return disabled;
-    },
-    loadNode(node, resolve) {
-      let that = this;
-      let parentId = 0;
-      if (node.data && node.data.organizationId) {
-        parentId = node.data.organizationId;
-      }
-     that.$api.organization.findByParent(parentId)
-        .then(Util.response)
-        .then(that.doLoadNode)
-        .then(resolve)
-        .catch(Util.error);
-      //that.$api.organization.findByParent(parentId).then(function(result) {
-      //   if (result.status == "success") {
-      //     let data = result.data;
-      //     data.forEach(function(value, index) {
-      //       value.isLeaf = value.isLeaf == "1" ? true : false;
-      //     });
-
-      //     resolve(data);
-      //   }
-      // });
-    },
-    doLoadNode(result) {
-      let p = new Promise((resolve, reject) => {
-        let data = result.data;
-        data.forEach(function(value, index) {
-          value.isLeaf = value.isLeaf == "1" ? true : false;
-        });
-
-        resolve(data);
-      });
-      return p;
     },
     handleCurrentChange(val) {
       this.page = val;
@@ -345,7 +298,8 @@ export default {
   },
   components: {
     "add-person-dialog": Dialog,
-    "edit-person-dialog": Dialog
+    "edit-person-dialog": Dialog,
+    "organization-tree":OrganizationTree
   }
 };
 </script>
