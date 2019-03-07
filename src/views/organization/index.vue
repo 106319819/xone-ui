@@ -2,24 +2,16 @@
   <el-row class="warp">
     <edit-dialog
       ref="edit-dialog"
-      title="修改"
-      :modify="true"
-      :organization="dialogs.organization"
-      :parent="dialogs.parent"
+      :title=" dialog.modify ? '修改' : '新增子组织'"
+      :modify="dialog.modify"
+      :organization="dialog.organization"
+      :parent="dialog.parent"
       v-on:onModify="onModify"
-      v-if="dialogs.editDialogVisible"
-      :visible.sync="dialogs.editDialogVisible"
-    ></edit-dialog>
-    <add-child-dialog
-      ref="add-child-dialog"
-      title="新增子组织"
-      :modify="false"
-      :organization="{}"
-      :parent="dialogs.parent"
       v-on:onCreateChild="onCreateChild"
-      v-if="dialogs.addChildVisible"
-      :visible.sync="dialogs.addChildVisible"
-    ></add-child-dialog>
+      v-if="dialog.visible"
+      :visible.sync="dialog.visible"
+    ></edit-dialog>
+    
     <el-col :span="24" class="warp-breadcrum">
       <el-breadcrumb separator="/">
         <el-breadcrumb-item :to="{ path: '/' }">
@@ -30,9 +22,9 @@
     </el-col>
     <el-row>
       <el-col :span="6">
-        <el-button @click="onAdd">新增组织</el-button>
-        <el-button @click="onAddChild('add-child-dialog')" :disabled="buttons.disabled">新增子组织</el-button>
-        <el-button @click="onModifyNode('add-child-dialog')" :disabled="buttons.disabled">修改</el-button>
+        <el-button @click="onAdd('edit-dialog')">新增组织</el-button>
+        <el-button @click="onAddChild('edit-dialog')" :disabled="buttons.disabled">新增子组织</el-button>
+        <el-button @click="onModifyNode('edit-dialog')" :disabled="buttons.disabled">修改</el-button>
       </el-col>
       <el-col :span="18">
         <!--工具条-->
@@ -82,7 +74,7 @@
           <!-- <el-table-column type="index" width="60"></el-table-column> -->
           <el-table-column label="操作" width="150">
             <template slot-scope="scope">
-              <el-button @click="onModifyButton('add-child-dialog',scope.$index,scope.row)">修改</el-button>
+              <el-button @click="onModifyButton('edit-dialog',scope.$index,scope.row)">修改</el-button>
               <el-button @click="onDeleteOrganization(scope.$index,scope.row)">删除</el-button>
             </template>
           </el-table-column>
@@ -112,16 +104,26 @@ import Dialog from "./dialog-form.vue";
 import OrganizationTree from "../../components/OrganizationTree"
 import Util from "../../common/util.js";
 export default {
+   components: {
+    "edit-dialog": Dialog,
+    "organization-tree":OrganizationTree
+  },
   data() {
     return {
       buttons: {
         disabled: true
       },
-      dialogs: {
-        addChildVisible: false,
-        editDialogVisible: false,
+      dialog: {
+        visible: false,
+        modify:false,
         parent: {},
-        organization: {}
+        organization: {
+          organizationName: '',
+          organizationNameEn: '',
+          organizationCode:'',
+          sortNo: 0,
+          comment:''
+        }
       },
       filters: {
         name: ""
@@ -139,8 +141,11 @@ export default {
     formatSex: function(row, column) {
       return row.sex == 1 ? "男" : row.sex == 0 ? "女" : row.organizationNameEn;
     },
-    onAdd() {
-      this.$router.push("/organization/edit");
+    onAdd(dom) {
+      //this.$router.push("/organization/edit");
+      this.dialog.visible = true;
+      this.dialog.modify = false;
+      this.dialog.parent = {};
     },
 
     disable() {
@@ -208,12 +213,10 @@ export default {
         }
       });
     },
-    onAddChild(dialog) {
-      this.dialogs.addChildVisible = true;
-      this.dialogs.parent = this.$refs["tree"].getCurrentNode();
-      if (this.$refs[dialog]) {
-        this.$refs[dialog].init(node.data);
-      }
+    onAddChild(dom) {
+      this.dialog.visible = true;
+      this.dialog.modify = false;
+      this.dialog.parent = this.$refs["tree"].getCurrentNode();
     },
     onCreateChild(child) {
       //this.$refs.tree.getCurrentNode()
@@ -222,21 +225,24 @@ export default {
       let node = this.$refs.tree.getNode(parent);
       node.expand();
       //this.loadNode()
+      this.handleNodeClick(parent,node);
     },
-    onModifyNode(dialog) {
-      this.dialogs.editDialogVisible = true;
+    onModifyNode(dom) {
+      this.dialog.visible = true;
+      this.dialog.modify = true;
       let organization = this.$refs.tree.getCurrentNode();
-      this.dialogs.organization = organization;
+      this.dialog.organization = organization;
       let node = this.$refs.tree.getNode(organization);
-      this.dialogs.parent = node.parent.data;
+      this.dialog.parent = node.parent.data;
     },
-    onModifyButton(dialog, index, row) {
-      this.dialogs.editDialogVisible = true;
+    onModifyButton(dom, index, row) {
+      this.dialog.visible = true;
+      this.dialog.modify = true;
       //let organization = this.$refs.tree.getCurrentNode();
-      //this.dialogs.organization = organization;
-      this.dialogs.organization = row;
+      //this.dialog.organization = organization;
+      this.dialog.organization = row;
       let node = this.$refs.tree.getNode(row.organizationId);
-      this.dialogs.parent = node.parent.data;
+      this.dialog.parent = node.parent.data;
     },
     onModify(data) {
       console.log("onModify");
@@ -308,11 +314,7 @@ export default {
   mounted() {
     //this.findByParent(0);
   },
-  components: {
-    "add-child-dialog": Dialog,
-    "edit-dialog": Dialog,
-    "organization-tree":OrganizationTree
-  }
+ 
 };
 </script>
 

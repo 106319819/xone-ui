@@ -1,6 +1,9 @@
 <template>
-
-  <el-select v-model="subSystemId" placeholder="请选择子系统" @change="onChange" >
+<!-- 使form组件也支持v-model指令 -->
+  <el-select v-model="subSystemId" placeholder="请选择子系统" 
+      v-bind:value="value"
+      v-on:change="$emit('change', $event)"
+  >
     <el-option
       v-for="item in items"
       :key="item.subSystemId"
@@ -13,27 +16,27 @@
 import Util from "../common/util.js";
 export default {
    name: 'SubSystemCombox',
-  //扩展权限
+  //扩展v-model指令支持
+  model: {
+    prop: 'value',
+    event: 'change'
+  },
   props: {
      //组织ID
     organizationId: { type: String, default: ''},
-    // //提示文本内容
-    // content:{type:String,default:null},
-    // //显示位置top/top-start/top-end/bottom/bottom-start/bottom-end/left/left-start/left-end/right/right-start/right-end
-    // placement:{type:String,default:'bottom'}
+    value:{type:String} //扩展v-model指令支持，与model中的prop属性一致
   },
   data() {
     return {
       items:[],
-      subSystemId:''
-
+      subSystemId:'',
     }
   },
   methods: {
-    onChange: function (subSystemId) {
-      // 按钮操作处理函数
-      this.$emit('change', subSystemId)
-    },
+    // onChange: function (subSystemId) {
+    //   // 按钮操作处理函数
+    //   this.$emit('change', subSystemId)
+    // },
     getSubSystem(){
       if(!Util.nvl(this.organizationId)){
         this.$api.subSystem.findByOrganization(this.organizationId).then(Util.response).then(this.onSubSystem).catch(Util.error);

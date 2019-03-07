@@ -102,16 +102,6 @@ export default {
         .catch(Util.error);
     },
     onCreate(result) {
-      // Util.confirm('确认要新增吗？').then((action) =>{
-      //   Util.info(`${action}`);
-      // }).catch((action)=>{
-      //   Util.info(`${action}`);
-      // });
-      // Util.prompt('请输入需要提交的数据').then(({action,value})=> {
-      //   Util.info(`${action}  ${value}`);
-      // }).catch((action)=>{
-      //   Util.info('取消输入');
-      // });
       this.$emit("onCreateChild", result.data);
       Util.message("新增成功！");
     },
@@ -122,25 +112,6 @@ export default {
           return;
         }
         that.doUpdate();
-        // that.loading = true;
-        // this.$api.organization.update(param).then(function (result) {
-        //     // that.loading = false;
-        //     if(result.status == 'success'){
-        //       that.$message.success({showClose: true, message: '更新成功', duration: 2000});
-        //       //通知parent，创建成功消息
-        //       that.$emit('onModify',result.data);
-        //     } else {
-        //       let txt = `更新失败，原因：${result.error} ${result.message}`;
-        //       that.$message.error({showClose: true, message: txt, duration: 2000});
-        //     }
-        //   }, function (err) {
-        //     // that.loading = false;
-        //     that.$message.error({showClose: true, message: err.toString(), duration: 2000});
-        //   }).catch(function (error) {
-        //     // that.loading = false;
-        //     console.log(error);
-        //     that.$message.error({showClose: true, message: '请求出现异常', duration: 2000});
-        //   });
       });
     },
     doUpdate() {

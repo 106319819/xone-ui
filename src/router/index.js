@@ -3,15 +3,15 @@ import Router from 'vue-router'
 import Home from '@/views/Home'
 import Dashboard from '@/views/Dashboard'
 
-import SubSystemList from '@/views/system/list'
+import SubSystemIndex from '@/views/system/index'
 
-import PersonList from '@/views/person/list'
+import PersonIndex from '@/views/person/index'
 import UserChangePwd from '@/views/person/changepwd'
 
-import OrganizationList from '@/views/organization/list'
+import OrganizationIndex from '@/views/organization/index'
 import OrganizationEdit from '@/views/organization/edit-form'
 
-import ModuleList from '@/views/module/list'
+import ModuleIndex from '@/views/module/index'
 // 懒加载方式，当路由被访问的时候才加载对应组件
 const Login = resolve => require(['@/views/Login'], resolve)
 
@@ -44,7 +44,7 @@ let router = new Router({
       menuShow: true,
       iconCls: 'iconfont icon-shuzhuangtu_o', // 图标样式class
       children: [
-        {path: '/organization/list', component: OrganizationList, name: '组织列表', menuShow: true},
+        {path: '/organization/index', component: OrganizationIndex, name: '组织列表', menuShow: true},
         {path:'/organization/edit',component:OrganizationEdit,name:'组织编辑', menuShow: true}
       ]
     },
@@ -56,7 +56,7 @@ let router = new Router({
       leaf: true, // 只有一个节点
       iconCls: 'iconfont icon-qunzu_o', // 图标样式class
       children: [
-        {path: '/person/list', component: PersonList, name: '人员列表', menuShow: true}
+        {path: '/person/index', component: PersonIndex, name: '人员列表', menuShow: true}
       ]
     },    
     {
@@ -67,7 +67,7 @@ let router = new Router({
       leaf: true, // 只有一个节点
       iconCls: 'iconfont icon-qunzu_o', // 图标样式class
       children: [
-        {path: '/module/list', component: ModuleList, name: '模块列表', menuShow: true}
+        {path: '/module/index', component: ModuleIndex, name: '模块列表', menuShow: true}
       ]
     },
     {
@@ -77,7 +77,7 @@ let router = new Router({
       menuShow: true,
       iconCls: 'iconfont icon-shu_o',
       children: [
-        {path: '/system/list', component: SubSystemList, name: '子系统管理', menuShow: true},
+        {path: '/system/index', component: SubSystemIndex, name: '子系统管理', menuShow: true},
       ]
     },
     {
@@ -87,7 +87,7 @@ let router = new Router({
       menuShow: true,
       iconCls: 'iconfont icon-quanjushezhi_o',
       children: [
-        {path: '/person/list', component: PersonList, name: '个人信息', menuShow: true},
+        {path: '/person/index', component: PersonIndex, name: '个人信息', menuShow: true},
         {path: '/person/changepwd', component: UserChangePwd, name: '修改密码', menuShow: true}
       ]
     },

@@ -136,9 +136,10 @@ import SubSystemCombox from "../../components/SubSystemCombox";
 export default {
   components: {
     PopupTreeInput,
-    "permission-button":PermissionButton,
+    
     TableTreeColumn,
     FaIconTooltip,
+    "permission-button":PermissionButton,
     "sub-system-combox":SubSystemCombox
   },
   data() {
