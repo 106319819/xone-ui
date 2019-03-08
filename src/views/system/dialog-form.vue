@@ -11,7 +11,7 @@
   >
     <el-row class="warp">
       <el-col :span="24" class="warp-main">
-        <el-form ref="form" :model="subSystem" :rules="validate" label-width="120px">
+        <el-form ref="form" :model="subSystem" :rules="validator" label-width="120px">
           <el-form-item label="名称">
             <el-input v-model="subSystem.name"></el-input>
           </el-form-item>
@@ -46,7 +46,7 @@ export default {
   },
   data() {
     return {
-      validate: {
+      validator: {
         name: [
           { required: true, message: "请输入姓", trigger: "blur" }
         ],
@@ -67,7 +67,7 @@ export default {
     },
     create() {
       let that = this;
-      this.$refs.form.validate(valid => {
+      this.$refs['form'].validate(valid => {
         if (!valid) {
           return;
         }

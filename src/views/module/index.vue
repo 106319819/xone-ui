@@ -2,9 +2,9 @@
   <div class="page-container">
 	<!--工具栏-->
 	<div class="toolbar" style="float:left;padding-top:10px;padding-left:15px;">
-		<el-form :inline="true" :model="filters" :size="size">
+		<el-form :inline="true" :model="filters" >
       <el-form-item label="子系统">
-        <sub-system-combox v-model="dataForm.subSystemId" @change="findTreeData" ></sub-system-combox>
+        <sub-system-combox v-model="dialog.dataForm.subSystemId" @change="findTreeData" ></sub-system-combox>
       </el-form-item>
 
 			<el-form-item>
@@ -19,7 +19,7 @@
 		</el-form>
 	</div>
 	<!--表格树内容栏-->
-    <el-table :data="tableTreeDdata" stripe size="mini" style="width: 100%;"
+    <el-table :data="tableTreeDdata" stripe style="width: 100%;"
       v-loading="loading" element-loading-text="加载中……">
       <el-table-column
         prop="id" header-align="center" align="center" width="80" label="ID">
@@ -34,7 +34,7 @@
       </el-table-column>
       <el-table-column prop="type" header-align="center" align="center" label="类型">
         <template slot-scope="scope">
-          <el-tag v-if="scope.row.type === 0" size="small">目录</el-tag>
+          <el-tag v-if="scope.row.type === 0" >目录</el-tag>
           <el-tag v-else-if="scope.row.type === 1" type="success">菜单</el-tag>
           <el-tag v-else-if="scope.row.type === 2" type="info">按钮</el-tag>
         </template>
@@ -66,9 +66,23 @@
       </el-table-column>
     </el-table>
     <!-- 新增修改界面 -->
-    <el-dialog icon="el-icon-menu" :title="!dataForm.moduleId ? '新增' : '修改'" width="40%" :visible.sync="dialogVisible" :close-on-click-modal="false">
+    <edit-dialog
+      ref="edit-dialog"
+      :title=" dialog.modify ? '修改' : '新增'"
+      :modify="dialog.modify"
+      :dataForm="dialog.dataForm"
+      :popupTreeData="dialog.popupTreeData"
+      :popupTreeProps="dialog.popupTreeProps"
+      v-on:onModify="onModify"
+      v-on:onCreate="onCreate"
+      v-if="dialog.visible"
+      :visible.sync="dialog.visible"
+    ></edit-dialog>
+
+    <!-- 新增修改界面 -->
+    <!-- <el-dialog icon="el-icon-menu" :title="!dataForm.moduleId ? '新增' : '修改'" width="40%" :visible.sync="dialogVisible" :close-on-click-modal="false">
       <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="submitForm()" 
-        label-width="80px" :size="size" style="text-align:left;">
+        label-width="80px"  style="text-align:left;">
         <el-form-item label="菜单类型" prop="type">
           <el-radio-group v-model="dataForm.type">
             <el-radio v-for="(type, index) in moduleTypeList" :label="index" :key="index">{{ type }}</el-radio>
@@ -121,26 +135,24 @@
         <el-button icon="el-icon-circle-close-outline"  @click="dialogVisible = false">取消</el-button>
         <el-button icon="el-icon-circle-check-outline"  type="primary" @click="submitForm()">保存</el-button>
       </span>
-    </el-dialog>
+    </el-dialog> -->
   </div>
 </template>
 
 <script>
 import PermissionButton from "../../components/PermissionButton";
 import TableTreeColumn from "@/components/TableTreeColumn";
-import PopupTreeInput from "@/components/PopupTreeInput";
 import FaIconTooltip from "@/components/FaIconTooltip";
 import Util from "../../common/util.js";
 import SubSystemCombox from "../../components/SubSystemCombox";
-
+import Dialog from "./dialog-form"
 export default {
   components: {
-    PopupTreeInput,
     
     TableTreeColumn,
-    FaIconTooltip,
     "permission-button":PermissionButton,
-    "sub-system-combox":SubSystemCombox
+    "sub-system-combox":SubSystemCombox,
+    "edit-dialog":Dialog
   },
   data() {
     return {
@@ -149,30 +161,29 @@ export default {
       filters: {
         name: ""
       },
+      dialog: {
+        visible: false,
+        modify:false,
+        popupTreeData: [],
+        popupTreeProps: {
+          label: "name",
+          children: "children"
+        },
+        dataForm: {
+            type: 1,
+            name: "",
+            parentId: 0,
+            parentName: "",
+            url: "",
+            permission: "",
+            sortNo: 0,
+            icon: "",
+            subSystemId:"",
+            iconList: []
+          }
+      },
       subSystems:[],//子系统
-      tableTreeDdata: [],
-      dialogVisible: false,
-      moduleTypeList: ["目录", "菜单", "按钮"],
-      dataForm: {
-        type: 1,
-        name: "",
-        parentId: 0,
-        parentName: "",
-        url: "",
-        permission: "",
-        sortNo: 0,
-        icon: "",
-        subSystemId:"",
-        iconList: []
-      },
-      dataRule: {
-        name: [{ required: true, message: "菜单名称不能为空", trigger: "blur" }]
-      },
-      popupTreeData: [],
-      popupTreeProps: {
-        label: "name",
-        children: "children"
-      }
+      tableTreeDdata:[]
     };
   },
   methods: {
@@ -181,7 +192,7 @@ export default {
       this.loading = true;
       this.$api.module.fetchTree(subSystemId).then(res => {
         this.tableTreeDdata = res.data;
-        this.popupTreeData = this.getParentMenuTree(res.data);
+        this.dialog.popupTreeData = this.getParentMenuTree(res.data);
         this.loading = false;
       });
     },
@@ -196,12 +207,16 @@ export default {
     },
     // 显示新增界面
     handleAdd: function() {
-      this.dialogVisible = true;
+      // this.dialogVisible = true;
+      this.dialog.modify = false;
+      this.dialog.visible = true;
     },
     // 显示编辑界面
     handleEdit: function(row) {
-      this.dialogVisible = true;
-      Object.assign(this.dataForm, row);
+      this.dialog.visible = true;
+      this.dialog.modify = true;
+      Object.assign(this.dialog.dataForm, row);
+      
     },
     // 删除
     handleDelete(row) {
@@ -225,43 +240,16 @@ export default {
       }
       return ids;
     },
-    // 菜单树选中
-    handleTreeSelectChange(data, node) {
-      this.dataForm.parentId = data.moduleId;
-      this.dataForm.parentName = data.name;
-    },
     // 图标选中
     iconActiveHandle(iconName) {
       this.dataForm.icon = iconName;
     },
-    // 表单提交
-    submitForm() {
-      this.$refs["dataForm"].validate(valid => {
-        if (valid) {
-            this.editLoading = true;
-            let { moduleId,type,name,parentId,url,permission,sortNo,icon,subSystemId} = this.dataForm;
-            let params = {moduleId, type,name,parentId,url,permission,sortNo,icon,subSystemId};
-            Util.clean(params);
-            if(!params.moduleId){
-              this.$api.module.create(params).then(Util.response).then(this.onCreate).catch(Util.error);
-            }else{
-              this.$api.module.update(params).then(Util.response).then(this.onUpdate).catch(Util.error);
-            }
-        }
-      });
-    },
     onCreate(result){
-      this.editLoading = false;
-      //this.$refs["dataForm"].resetFields();
-      //this.dialogVisible = false;
-      this.findTreeData(this.dataForm.subSystemId);
+      this.findTreeData(this.dialog.dataForm.subSystemId);
       Util.message("新增成功");
     },
-    onUpdate(result){
-      this.editLoading = false;
-      //this.$refs["dataForm"].resetFields();
-      //this.dialogVisible = false;
-      this.findTreeData(this.dataForm.subSystemId);
+    onModify(result){
+      this.findTreeData(this.dialog.dataForm.subSystemId);
       Util.message("修改成功");
     },
     getSubSystem(){
@@ -277,6 +265,3 @@ export default {
   }
 };
 </script>
-
-<style scoped>
-</style>

@@ -8,7 +8,7 @@ import api from './api'
 import 'element-ui/lib/theme-chalk/index.css'
 import '@/assets/styles/iconfont.css'
 import '@/assets/styles/main.scss'
-
+// import '@/assets/styles/form.scss'
 Vue.config.productionTip = false
 Vue.use(ElementUI,{size: 'mini'})
 Vue.use(api)

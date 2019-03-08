@@ -2,8 +2,7 @@
 <!-- 使form组件也支持v-model指令 -->
   <el-select v-model="subSystemId" placeholder="请选择子系统" 
       v-bind:value="value"
-      v-on:change="$emit('change', $event)"
-  >
+      v-on:change="$emit('change', $event)">
     <el-option
       v-for="item in items"
       :key="item.subSystemId"
