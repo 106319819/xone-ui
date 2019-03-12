@@ -12,7 +12,7 @@
     <el-row class="warp">
       <el-col :span="24" class="warp-main">
         <el-form ref="form" :model="organization" :rules="validate" label-width="120px">
-          <el-form-item label="组织名称">
+          <el-form-item label="组织名称" prop="organizationName">
             <el-input v-model="organization.organizationName"></el-input>
           </el-form-item>
           <el-form-item label="英文名称">
@@ -52,16 +52,6 @@ export default {
   },
   data() {
     return {
-      // organization: {
-      //   organizationName: '',
-      //   organizationNameEn: '',
-      //   organizationCode:'',
-      //   sortNo: 0,
-      //   parentId:0,
-      //   comment:''
-      // },
-      //title:'t-title',
-      //parent:{},
       validate: {
         organizationName: [
           { required: true, message: "请输入组织名称", trigger: "blur" }

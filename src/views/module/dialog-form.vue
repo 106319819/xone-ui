@@ -10,29 +10,28 @@
      <div slot="title">
       <i class="el-icon-edit-outline"></i> {{title}}
      </div>
-      <el-form :model="dataForm" :rules="validator" ref="dataForm" @keyup.enter.native="submitForm()" 
-        label-width="80px"  style="text-align:left;">
+      <el-form :model="module" :rules="validator" ref="form" label-width="100px"  style="text-align:left;">
         <el-form-item label="菜单类型" prop="type">
-          <el-radio-group v-model="dataForm.type">
+          <el-radio-group v-model="module.type">
             <el-radio v-for="(type, index) in moduleTypeList" :label="index" :key="index">{{ type }}</el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item :label="moduleTypeList[dataForm.type] + '名称'" prop="name">
-          <el-input v-model="dataForm.name" :placeholder="moduleTypeList[dataForm.type] + '名称'"></el-input>
+        <el-form-item :label="moduleTypeList[module.type] + '名称'" prop="name">
+          <el-input v-model="module.name" :placeholder="moduleTypeList[module.type] + '名称'"></el-input>
         </el-form-item>
         <el-form-item label="上级菜单" prop="parentName">
             <popup-tree-input 
-              :data="popupTreeData" :props="popupTreeProps" :prop=" nvl(dataForm.parentName) ? '顶级菜单' : dataForm.parentName" 
-              :nodeKey="''+dataForm.parentId" :currentChangeHandle="handleTreeSelectChange">
+              :data="menuTree" :props="menuTreeProps" :prop=" nvl(module.parentName) ? '顶级菜单' : module.parentName" 
+              :nodeKey="''+module.parentId" :currentChangeHandle="handleTreeSelectChange">
             </popup-tree-input>
         </el-form-item>
-        <el-form-item v-if="dataForm.type !== 0" label="授权标识" prop="permission">
-          <el-input v-model="dataForm.permission" placeholder="如: sys:user:add, sys:user:edit, sys:user:delete"></el-input>
+        <el-form-item v-if="module.type !== 0" label="授权标识" prop="permission">
+          <el-input v-model="module.permission" placeholder="如: sys:user:add, sys:user:edit, sys:user:delete"></el-input>
         </el-form-item>
-        <el-form-item v-if="dataForm.type === 1" label="菜单路由" prop="url">
+        <el-form-item v-if="module.type === 1" label="菜单路由" prop="url">
           <el-row>
             <el-col :span="22">
-                <el-input v-model="dataForm.url" placeholder="菜单路由"></el-input>
+                <el-input v-model="module.url" placeholder="菜单路由"></el-input>
             </el-col>
             <el-col :span="2" class="icon-list__tips">
                 <el-tooltip placement="top" effect="light" style="padding: 10px;">
@@ -46,13 +45,13 @@
             </el-col>
           </el-row>
         </el-form-item>
-        <el-form-item v-if="dataForm.type !== 2" label="排序编号" prop="sortNo">
-          <el-input-number v-model="dataForm.sortNo" controls-position="right" :min="0" label="排序编号"></el-input-number>
+        <el-form-item v-if="module.type !== 2" label="排序编号" prop="sortNo">
+          <el-input-number v-model="module.sortNo" controls-position="right" :min="0" label="排序编号"></el-input-number>
         </el-form-item>
-        <el-form-item v-if="dataForm.type !== 2" label="菜单图标" prop="icon">
+        <el-form-item v-if="module.type !== 2" label="菜单图标" prop="icon">
           <el-row>
             <el-col :span="22">
-              <el-input v-model="dataForm.icon" v-popover:iconListPopover :readonly="false" placeholder="菜单图标名称（如：fa fa-home fa-lg）" class="icon-list__input"></el-input>
+              <el-input v-model="module.icon" v-popover:iconListPopover :readonly="false" placeholder="菜单图标名称（如：fa fa-home fa-lg）" class="icon-list__input"></el-input>
             </el-col>
             <el-col :span="2" class="icon-list__tips">
               <fa-icon-tooltip />
@@ -79,16 +78,19 @@ export default {
     visible: { type: Boolean, default: false },
     title: { type: String, default: "hi" },
     modify: { type: Boolean, default: false },
-    popupTreeData: { type: Array },
-    popupTreeProps:{type:Object},
-    dataForm:{type:Object}
+    menuTree: { type: Array },
+    module:{type:Object}
   },
   data() {
     return {
       moduleTypeList: ["目录", "菜单", "按钮"],
       validator: {
         name: [{ required: true, message: "菜单名称不能为空", trigger: "blur" }]
-      }
+      },
+      menuTreeProps: {
+          label: "name",
+          children: "children"
+        },
     };
   },
   methods: {
@@ -102,7 +104,7 @@ export default {
     },
     create() {
       let that = this;
-      this.$refs["dataForm"].validate(valid => {
+      this.$refs.form.validate(valid => {
         if (!valid) {
           return;
         }
@@ -111,7 +113,7 @@ export default {
 
     },
     doCreate() {
-      let { moduleId,type,name,parentId,url,permission,sortNo,icon,subSystemId} = this.dataForm;
+      let { moduleId,type,name,parentId,url,permission,sortNo,icon,subSystemId} = this.module;
       let params = {moduleId, type,name,parentId,url,permission,sortNo,icon,subSystemId};
       Util.clean(params);
       this.$api.module.create(params).then(Util.response).then(this.onCreate).catch(Util.error);
@@ -122,7 +124,7 @@ export default {
     },
     update() {
       let that = this;
-       this.$refs["dataForm"].validate(valid => {
+       this.$refs.form.validate(valid => {
         if (!valid) {
           return;
         }
@@ -130,7 +132,7 @@ export default {
       });
     },
     doUpdate() {
-      let { moduleId,type,name,parentId,url,permission,sortNo,icon,subSystemId} = this.dataForm;
+      let { moduleId,type,name,parentId,url,permission,sortNo,icon,subSystemId} = this.module;
       let params = {moduleId, type,name,parentId,url,permission,sortNo,icon,subSystemId};
       Util.clean(params);
       this.$api.module.update(params).then(Util.response).then(this.onModify).catch(Util.error);
@@ -146,8 +148,8 @@ export default {
     },
     // 菜单树选中
     handleTreeSelectChange(data, node) {
-      this.dataForm.parentId = data.moduleId;
-      this.dataForm.parentName = data.name;
+      this.module.parentId = data.moduleId;
+      this.module.parentName = data.name;
     },
     nvl(arg){
       return Util.nvl(arg);

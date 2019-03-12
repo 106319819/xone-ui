@@ -12,18 +12,18 @@
     <el-row class="warp">
       <el-col :span="24" class="warp-main">
         <el-form ref="form" :model="person" :rules="validate" label-width="120px">
-          <el-form-item label="姓">
+          <el-form-item label="姓" prop="firstName">
             <el-input v-model="person.firstName"></el-input>
           </el-form-item>
-          <el-form-item label="名">
+          <el-form-item label="名" prop="lastName">
             <el-input v-model="person.lastName"></el-input>
           </el-form-item>
           
-          <el-form-item label="账号">
+          <el-form-item label="账号" prop="accountCode">
             <el-input v-model="person.account.accountCode"></el-input>
           </el-form-item>
           
-          <el-form-item label="密码">
+          <el-form-item label="密码" prop="password">
             <el-input v-model="person.account.password"></el-input>
           </el-form-item>
 
@@ -64,23 +64,11 @@ export default {
   },
   data() {
     return {
-      // organization: {
-      //   organizationName: '',
-      //   organizationNameEn: '',
-      //   organizationCode:'',
-      //   sortNo: 0,
-      //   parentId:0,
-      //   comment:''
-      // },
-      //title:'t-title',
-      //parent:{},
       validate: {
-        firstName: [
-          { required: true, message: "请输入姓", trigger: "blur" }
-        ],
-        personCode: [
-          { required: true, message: "请输入编码", trigger: "blur" }
-        ]
+        firstName: [{ required: true, message: "请输入姓", trigger: "blur" }],
+        lastName: [{ required: true, message: "请输入名", trigger: "blur" }],
+        accountCode:[{ required: true, message: "请输入账号", trigger: "blur" }],
+        password:[{ required: true, message: "请输入密码", trigger: "blur" }],
       }
     };
   },

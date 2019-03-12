@@ -4,7 +4,7 @@
 	<div class="toolbar" style="float:left;padding-top:10px;padding-left:15px;">
 		<el-form :inline="true" :model="filters" >
       <el-form-item label="子系统">
-        <sub-system-combox v-model="dialog.dataForm.subSystemId" @change="findTreeData" ></sub-system-combox>
+        <sub-system-combox v-model="dialog.module.subSystemId" @change="findTreeData" ></sub-system-combox>
       </el-form-item>
 
 			<el-form-item>
@@ -19,7 +19,7 @@
 		</el-form>
 	</div>
 	<!--表格树内容栏-->
-    <el-table :data="tableTreeDdata" stripe style="width: 100%;"
+    <el-table :data="moduleTree" stripe style="width: 100%;"
       v-loading="loading" element-loading-text="加载中……">
       <el-table-column
         prop="id" header-align="center" align="center" width="80" label="ID">
@@ -70,72 +70,13 @@
       ref="edit-dialog"
       :title=" dialog.modify ? '修改' : '新增'"
       :modify="dialog.modify"
-      :dataForm="dialog.dataForm"
-      :popupTreeData="dialog.popupTreeData"
-      :popupTreeProps="dialog.popupTreeProps"
+      :module="dialog.module"
+      :menuTree="dialog.menuTree"
       v-on:onModify="onModify"
       v-on:onCreate="onCreate"
       v-if="dialog.visible"
       :visible.sync="dialog.visible"
     ></edit-dialog>
-
-    <!-- 新增修改界面 -->
-    <!-- <el-dialog icon="el-icon-menu" :title="!dataForm.moduleId ? '新增' : '修改'" width="40%" :visible.sync="dialogVisible" :close-on-click-modal="false">
-      <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="submitForm()" 
-        label-width="80px"  style="text-align:left;">
-        <el-form-item label="菜单类型" prop="type">
-          <el-radio-group v-model="dataForm.type">
-            <el-radio v-for="(type, index) in moduleTypeList" :label="index" :key="index">{{ type }}</el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item :label="moduleTypeList[dataForm.type] + '名称'" prop="name">
-          <el-input v-model="dataForm.name" :placeholder="moduleTypeList[dataForm.type] + '名称'"></el-input>
-        </el-form-item>
-        <el-form-item label="上级菜单" prop="parentName">
-            <popup-tree-input 
-              :data="popupTreeData" :props="popupTreeProps" :prop="dataForm.parentName==null||dataForm.parentName==''?'顶级菜单':dataForm.parentName" 
-              :nodeKey="''+dataForm.parentId" :currentChangeHandle="handleTreeSelectChange">
-            </popup-tree-input>
-        </el-form-item>
-        <el-form-item v-if="dataForm.type !== 0" label="授权标识" prop="permission">
-          <el-input v-model="dataForm.permission" placeholder="如: sys:user:add, sys:user:edit, sys:user:delete"></el-input>
-        </el-form-item>
-        <el-form-item v-if="dataForm.type === 1" label="菜单路由" prop="url">
-          <el-row>
-            <el-col :span="22">
-                <el-input v-model="dataForm.url" placeholder="菜单路由"></el-input>
-            </el-col>
-            <el-col :span="2" class="icon-list__tips">
-                <el-tooltip placement="top" effect="light" style="padding: 10px;">
-                  <div slot="content">
-                    <p>URL格式：</p>
-                    <p>1.常规业务开发的功能URL，如用户管理，Views目录下页面路径为 /Sys/User, 此处填写 /sys/user。</p>
-                    <p>2.嵌套外部网页，如通过菜单打开百度网页，此处填写 http://www.baidu.com，http:// 不可省略。</p>
-                    <p>示例：用户管理：/sys/user 嵌套百度：http://www.baidu.com 嵌套网页：http://127.0.0.1:8000</p></div>
-                  <i class="el-icon-warning"></i>
-                </el-tooltip>
-            </el-col>
-          </el-row>
-        </el-form-item>
-        <el-form-item v-if="dataForm.type !== 2" label="排序编号" prop="sortNo">
-          <el-input-number v-model="dataForm.sortNo" controls-position="right" :min="0" label="排序编号"></el-input-number>
-        </el-form-item>
-        <el-form-item v-if="dataForm.type !== 2" label="菜单图标" prop="icon">
-          <el-row>
-            <el-col :span="22">
-              <el-input v-model="dataForm.icon" v-popover:iconListPopover :readonly="false" placeholder="菜单图标名称（如：fa fa-home fa-lg）" class="icon-list__input"></el-input>
-            </el-col>
-            <el-col :span="2" class="icon-list__tips">
-              <fa-icon-tooltip />
-            </el-col>
-          </el-row>
-        </el-form-item>
-      </el-form>
-      <span slot="footer" class="dialog-footer">
-        <el-button icon="el-icon-circle-close-outline"  @click="dialogVisible = false">取消</el-button>
-        <el-button icon="el-icon-circle-check-outline"  type="primary" @click="submitForm()">保存</el-button>
-      </span>
-    </el-dialog> -->
   </div>
 </template>
 
@@ -156,7 +97,6 @@ export default {
   },
   data() {
     return {
-      size: "small",
       loading: false,
       filters: {
         name: ""
@@ -164,12 +104,8 @@ export default {
       dialog: {
         visible: false,
         modify:false,
-        popupTreeData: [],
-        popupTreeProps: {
-          label: "name",
-          children: "children"
-        },
-        dataForm: {
+        menuTree: [],
+        module: {
             type: 1,
             name: "",
             parentId: 0,
@@ -183,7 +119,7 @@ export default {
           }
       },
       subSystems:[],//子系统
-      tableTreeDdata:[]
+      moduleTree:[]
     };
   },
   methods: {
@@ -191,17 +127,17 @@ export default {
     findTreeData: function(subSystemId) {
       this.loading = true;
       this.$api.module.fetchTree(subSystemId).then(res => {
-        this.tableTreeDdata = res.data;
-        this.dialog.popupTreeData = this.getParentMenuTree(res.data);
+        this.moduleTree = res.data;
+        this.dialog.menuTree = this.getParentMenuTree(res.data);
         this.loading = false;
       });
     },
     // 获取上级菜单树
-    getParentMenuTree: function(tableTreeDdata) {
+    getParentMenuTree: function(moduleTree) {
       let parent = {
         parentId: 0,
         name: "顶级菜单",
-        children: tableTreeDdata
+        children: moduleTree
       };
       return [parent];
     },
@@ -215,24 +151,25 @@ export default {
     handleEdit: function(row) {
       this.dialog.visible = true;
       this.dialog.modify = true;
-      Object.assign(this.dialog.dataForm, row);
+      Object.assign(this.dialog.module, row);
       
     },
     // 删除
     handleDelete(row) {
-      this.$confirm("确认删除选中记录吗？", "提示", {
-        type: "warning"
-      }).then(() => {
-        let params = this.getDeleteIds([], row);
-        this.$api.module.batchDelete(params).then(res => {
-          this.findTreeData();
-          this.$message({ message: "删除成功", type: "success" });
-        });
-      });
+      Util.confirm("确认删除选中记录吗？",row).then(this.doDelete).catch(()=>{});
     },
+    doDelete(row){
+      let params = this.getDeleteIds([], row);
+      this.$api.module.deleteBatch(params).then(Util.response).then(this.onDelete).catch(Util.error);
+    },
+    onDelete(result){
+      this.findTreeData(this.dialog.module.subSystemId);
+      Util.message("删除成功");
+    },
+
     // 获取删除的包含子菜单的id列表
     getDeleteIds(ids, row) {
-      ids.push({ id: row.moduleId });
+      ids.push(row.moduleId);
       if (row.children != null) {
         for (let i = 0, len = row.children.length; i < len; i++) {
           this.getDeleteIds(ids, row.children[i]);
@@ -242,14 +179,14 @@ export default {
     },
     // 图标选中
     iconActiveHandle(iconName) {
-      this.dataForm.icon = iconName;
+      this.module.icon = iconName;
     },
     onCreate(result){
-      this.findTreeData(this.dialog.dataForm.subSystemId);
+      this.findTreeData(this.dialog.module.subSystemId);
       Util.message("新增成功");
     },
     onModify(result){
-      this.findTreeData(this.dialog.dataForm.subSystemId);
+      this.findTreeData(this.dialog.module.subSystemId);
       Util.message("修改成功");
     },
     getSubSystem(){

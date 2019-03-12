@@ -12,11 +12,11 @@
     <el-row class="warp">
       <el-col :span="24" class="warp-main">
         <el-form ref="form" :model="subSystem" :rules="validator" label-width="120px">
-          <el-form-item label="名称">
-            <el-input v-model="subSystem.name"></el-input>
+          <el-form-item label="名称" prop="name">
+            <el-input v-model="subSystem.name" ></el-input>
           </el-form-item>
-          <el-form-item label="编码">
-            <el-input v-model="subSystem.code"></el-input>
+          <el-form-item label="编码" prop="code">
+            <el-input v-model="subSystem.code" ></el-input>
           </el-form-item>
           <el-form-item label="组织">
             <el-input :value="organization.organizationName"></el-input>
@@ -40,19 +40,15 @@ export default {
   props: {
     visible: { type: Boolean, default: false },
     title: { type: String, default: "hi" },
-    subSystem: { type: Object, default: {} },
+    subSystem: { type: Object},
     modify: { type: Boolean, default: false },
     organization: { type: Object, default: {} }
   },
   data() {
     return {
       validator: {
-        name: [
-          { required: true, message: "请输入姓", trigger: "blur" }
-        ],
-        code: [
-          { required: true, message: "请输入编码", trigger: "blur" }
-        ]
+        name: [{ required: true, message: "请输入名称", trigger: "blur" }],
+        code: [{ required: true, message: "请输入编码", trigger: "blur" }]
       }
     };
   },
