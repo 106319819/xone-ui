@@ -9,6 +9,7 @@ import subSystem from './modules/subSystem'
 import module from './modules/module'
 import role from './modules/role'
 import roleModule from './modules/roleModule'
+import rolePerson from './modules/rolePerson'
 
 // 默认全部导出
 export default {
@@ -18,5 +19,6 @@ export default {
     subSystem,
     module,
     role,
-    roleModule
+    roleModule,
+    rolePerson
 }
