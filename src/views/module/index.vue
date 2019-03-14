@@ -1,24 +1,24 @@
 <template>
   <div class="page-container">
-	<!--工具栏-->
-	<div class="toolbar" style="float:left;padding-top:10px;padding-left:15px;">
-		<el-form :inline="true" :model="filters" >
-      <el-form-item label="子系统">
-        <sub-system-combox v-model="dialog.module.subSystemId" @change="findTreeData" ></sub-system-combox>
-      </el-form-item>
+    <!--工具栏-->
+    <div class="toolbar" style="float:left;padding-top:10px;padding-left:15px;">
+      <el-form :inline="true" :model="filters" >
+        <el-form-item label="子系统">
+          <sub-system-combox v-model="dialog.module.subSystemId" @change="findTreeData" ></sub-system-combox>
+        </el-form-item>
 
-			<el-form-item>
-				<el-input v-model="filters.name" placeholder="名称"></el-input>
-			</el-form-item>
-			<el-form-item>
-				<permission-button icon="el-icon-search"  permission="sys:module:view" type="primary" @click="findTreeData(null)">查找</permission-button>
-			</el-form-item>
-			<el-form-item>
-				<permission-button icon="el-icon-circle-plus-outline" permission="sys:module:add" type="primary" @click="handleAdd">新增</permission-button>
-			</el-form-item>
-		</el-form>
-	</div>
-	<!--表格树内容栏-->
+        <el-form-item>
+          <el-input v-model="filters.name" placeholder="名称"></el-input>
+        </el-form-item>
+        <el-form-item>
+          <permission-button icon="el-icon-search"  permission="sys:module:view" type="primary" @click="findTreeData(null)">查找</permission-button>
+        </el-form-item>
+        <el-form-item>
+          <permission-button icon="el-icon-circle-plus-outline" permission="sys:module:add" type="primary" @click="handleAdd">新增</permission-button>
+        </el-form-item>
+      </el-form>
+    </div>
+	  <!--表格树内容栏-->
     <el-table :data="moduleTree" stripe style="width: 100%;"
       v-loading="loading" element-loading-text="加载中……">
       <el-table-column
@@ -144,6 +144,11 @@ export default {
     // 显示新增界面
     handleAdd: function() {
       // this.dialogVisible = true;
+      if(Util.nvl(this.dialog.module.subSystemId)){
+        Util.message("请先选择子系统，再做此操作！");
+        return;
+      }
+      
       this.dialog.modify = false;
       this.dialog.visible = true;
     },

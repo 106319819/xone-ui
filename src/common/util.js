@@ -152,7 +152,7 @@ export default {
   * (format(d,"yyyy-MM-dd hh:mm:ss.S") ==> 2006-07-02 08:09:04.423 
   * (format(d,"yyyy-M-d h:m:s.S")      ==> 2006-7-2 8:9:4.18 
   */
-  format: function (d, fmt) { //author: meizz   
+  format: function (d, {fmt = 'yyyy-MM-dd hh:mm:ss'}={}) { //author: meizz   
     var o = {
       "M+": d.getMonth() + 1, //月份   
       "d+": d.getDate(), //日   

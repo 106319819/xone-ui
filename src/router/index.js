@@ -12,6 +12,8 @@ import OrganizationIndex from '@/views/organization/index'
 import OrganizationEdit from '@/views/organization/edit-form'
 
 import ModuleIndex from '@/views/module/index'
+import RoleIndex from '@/views/role/index'
+
 // 懒加载方式，当路由被访问的时候才加载对应组件
 const Login = resolve => require(['@/views/Login'], resolve)
 
@@ -59,6 +61,17 @@ let router = new Router({
         {path: '/person/index', component: PersonIndex, name: '人员列表', menuShow: true}
       ]
     },    
+    
+    {
+      path: '/',
+      component: Home,
+      name: '子系统管理',
+      menuShow: true,
+      iconCls: 'iconfont icon-shu_o',
+      children: [
+        {path: '/system/index', component: SubSystemIndex, name: '子系统管理', menuShow: true},
+      ]
+    },
     {
       path: '/',
       component: Home,
@@ -73,11 +86,12 @@ let router = new Router({
     {
       path: '/',
       component: Home,
-      name: '子系统管理',
+      name: '角色管理',
       menuShow: true,
-      iconCls: 'iconfont icon-shu_o',
+      leaf: true, // 只有一个节点
+      iconCls: 'iconfont icon-qunzu_o', // 图标样式class
       children: [
-        {path: '/system/index', component: SubSystemIndex, name: '子系统管理', menuShow: true},
+        {path: '/role/index', component: RoleIndex, name: '角色列表', menuShow: true}
       ]
     },
     {
