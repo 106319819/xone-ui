@@ -2,24 +2,16 @@
   <el-row class="warp">
     <edit-person-dialog
       ref="edit-person-dialog"
-      title="修改组织人员"
-      :modify="true"
-      :person="dialogs.person"
-      :organization="dialogs.organization"
+      :title = "dialog.modify ?  '修改组织人员' : '新增组织人员' "
+      :modify= "dialog.modify"
+      :person="dialog.person"
+      :organization="dialog.organization"
       v-on:onModify="onModify"
-      v-if="dialogs.editDialogVisible"
-      :visible.sync="dialogs.editDialogVisible"
-    ></edit-person-dialog>
-    <add-person-dialog
-      ref="add-person-dialog"
-      title="新增组织人员"
-      :modify="false"
-      :person="dialogs.person"
-      :organization="dialogs.organization"
       v-on:onCreatePerson="onCreatePerson"
-      v-if="dialogs.addChildVisible"
-      :visible.sync="dialogs.addChildVisible"
-    ></add-person-dialog>
+      v-if="dialog.visible"
+      :visible.sync="dialog.visible"
+    ></edit-person-dialog>
+    
     <el-col :span="24" class="warp-breadcrum">
       <el-breadcrumb separator="/">
         <el-breadcrumb-item :to="{ path: '/' }">
@@ -30,7 +22,7 @@
     </el-col>
     <el-row>
       <el-col :span="6">
-        <el-button @click="onAddPerson('add-person-dialog')" :disabled="buttons.disabled">新增组织人员</el-button>
+        <el-button @click="onAddPerson('edit-person-dialog')" :disabled="buttons.disabled">新增组织人员</el-button>
       </el-col>
       <el-col :span="18">
         <!--工具条-->
@@ -65,10 +57,10 @@
     </el-row>
 
     <el-row>
-      <el-col :span="6">
+      <el-col :span="3">
         <organization-tree @node-click="handleNodeClick" ref="tree"></organization-tree>
       </el-col>
-      <el-col :span="18">
+      <el-col :span="21">
         <el-table
           :data="persons"
           highlight-current-row
@@ -80,8 +72,25 @@
           <!-- <el-table-column type="index" width="60"></el-table-column> -->
           <el-table-column label="操作" width="150">
             <template slot-scope="scope">
-              <el-button @click="onModifyButton('add-person-dialog',scope.$index,scope.row)">修改</el-button>
-              <el-button @click="onDeletePerson(scope.$index,scope.row)">删除</el-button>
+              <el-tooltip content="编辑">
+                <el-button @click="onModifyButton('edit-person-dialog',scope.$index,scope.row)" icon="el-icon-edit" type="primary" circle></el-button>
+              </el-tooltip>
+              <el-tooltip content="删除">
+                <el-button @click="onDeletePerson(scope.$index,scope.row)" icon="el-icon-delete" type="danger" circle ></el-button>
+              </el-tooltip>
+              <el-popover placement="right" trigger="click" @show="onShowRolesByPerson(scope.$index,scope.row)">
+                <el-select v-model="roles" multiple placeholder="请选择" >
+                  <el-option v-for="item in items"
+                    :key="item.roleId" :label="item.name" :value="item.roleId">
+                  </el-option>
+                </el-select>
+                <el-tooltip content="保存">
+                  <el-button @click="onSaveRolePerson(scope.$index,scope.row)" icon="el-icon-check" type="primary" circle ></el-button>
+                </el-tooltip>
+                <el-tooltip content="角色" slot="reference">
+                  <el-button  icon="el-icon-more" type="success" circle></el-button>
+                </el-tooltip>
+              </el-popover>
             </template>
           </el-table-column>
 
@@ -109,17 +118,23 @@
 <script>
 import OrganizationTree from "../../components/OrganizationTree"
 import Dialog from "./dialog-form.vue";
+import RoleCombox from "../../components/RoleCombox"
 import Util from "../../common/util.js";
 export default {
+  components: {
+    "edit-person-dialog": Dialog,
+    "organization-tree":OrganizationTree,
+    "role-combox" : RoleCombox
+  },
   data() {
     return {
       
       buttons: {
         disabled: true
       },
-      dialogs: {
-        addChildVisible: false,
-        editDialogVisible: false,
+      dialog: {
+        visible: false,
+        modify:false,
         person: {account:{accountCode:'',password:''}},
         organization: {}
       },
@@ -128,6 +143,8 @@ export default {
       },
       loading: false,
       persons: [],
+      roles:[],
+      items:[],
       total: 0,
       page: 1,
       limit: 10,
@@ -205,12 +222,10 @@ export default {
       });
     },
     onAddPerson(dialog) {
-      this.dialogs.addChildVisible = true;
-      this.dialogs.organization = this.$refs["tree"].getCurrentNode();
+      this.dialog.visible = true;
+      this.dialog.modify = false;
+      this.dialog.organization = this.$refs["tree"].getCurrentNode();
 
-      // if (this.$refs[dialog]) {
-      //   this.$refs[dialog].init(node.data);
-      // }
     },
     onCreatePerson(child) {
       //this.$refs.tree.getCurrentNode()
@@ -221,12 +236,11 @@ export default {
       //this.loadNode()
     },
     onModifyButton(dialog, index, row) {
-      this.dialogs.editDialogVisible = true;
-      //let organization = this.$refs.tree.getCurrentNode();
-      //this.dialogs.organization = organization;
-      this.dialogs.person = row;
+      this.dialog.visible = true;
+      this.dialog.modify = true;
+      this.dialog.person = row;
       let organization = this.$refs.tree.getCurrentNode();
-      this.dialogs.organization = organization;
+      this.dialog.organization = organization;
     },
     onModify(data) {
       console.log("onModify");
@@ -243,7 +257,7 @@ export default {
       //Util.alert(`${row.fullName}`);
       // let organization = this.$refs.tree.getCurrentNode();
        that.$api.person.delete(row.personId)
-        .then(Util.response)
+        
         .then(this.onDeleteNode)
         .catch(Util.error);
     },
@@ -272,7 +286,7 @@ export default {
       let that = this;
       let params = selections.map(item => item.personId).toString();
       that.$api.person.deleteBatch(params.split(","))
-        .then(Util.response)
+        
         .then(that.onBatchDelete)
         .catch(Util.error);
     },
@@ -291,16 +305,49 @@ export default {
 
       this.selections = [];
       Util.message("删除成功！");
+    },
+    findAllRoles(){
+        let params = Util.stringify({page:1,size:100});
+        this.$api.role.findAll(params).then(this.onFindAllRoles).catch(Util.error);
+    },
+    onFindAllRoles(result){
+      if(result.data.content){
+        this.items = result.data.content;
+      }else{
+        this.items = result.data;
+      }
+      //外边传入的选中值
+      //this.roles = values;
+    },
+    onShowRolesByPerson(index,row){
+        let personId = row.personId;
+        this.$api.rolePerson.findRolesByPersonId(personId).then(this.onCheckRoles).catch(Util.error);
+    },
+    onCheckRoles(result){
+      this.roles = [];
+      let data = result.data;
+      data.forEach((role,index) =>{
+        this.roles.push(role.roleId);
+      });
+      // this.$refs['roleCombox'].setCheck(this.roles);
+    },
+    onSaveRolePerson(index,row){
+      let personId = row.personId;
+      let rps = [];
+      this.roles.forEach((role,index) =>{
+        rps.push({personId:personId,roleId:role});
+      });
+      this.$api.rolePerson.create(personId,rps).then(this.onCreateRolePerson).catch(Util.error);
+    },
+    onCreateRolePerson(result){
+      Util.message("角色保存成功");
     }
   },
   mounted() {
     //this.findByParent(0);
+    this.findAllRoles();
   },
-  components: {
-    "add-person-dialog": Dialog,
-    "edit-person-dialog": Dialog,
-    "organization-tree":OrganizationTree
-  }
+  
 };
 </script>
 

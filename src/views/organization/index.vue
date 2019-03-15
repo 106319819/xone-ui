@@ -260,7 +260,7 @@ export default {
     doDeleteNode() {
       let organization = this.$refs.tree.getCurrentNode();
       that.$api.organization.delete(organization.organizationId)
-        .then(Util.response)
+        
         .then(this.onDeleteNode)
         .catch(Util.error);
     },
@@ -288,7 +288,7 @@ export default {
       let that = this;
       let params = that.selections.map(item => item.organizationId).toString();
       that.$api.organization.deleteBatch(params.split(","))
-        .then(Util.response)
+        
         .then(that.onBatchDelete)
         .catch(Util.error);
     },

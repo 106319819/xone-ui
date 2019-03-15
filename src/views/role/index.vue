@@ -67,8 +67,8 @@
 					</span>
 		</el-tree>
 		<el-row >
-				<el-col span="12"><el-checkbox v-model="checkAll" @change="handleCheckAll"><b>全选</b></el-checkbox></el-col>
-				<el-col span="12">
+				<el-col :span="12"><el-checkbox v-model="checkAll" @change="handleCheckAll"><b>全选</b></el-checkbox></el-col>
+				<el-col :span="12">
 					<permission-button permission="sys:role:edit" type="primary" @click="resetSelection" >重置</permission-button>
 					<permission-button permission="sys:role:edit" type="primary" @click="submitAuthForm" >提交</permission-button>
 				</el-col>
@@ -151,7 +151,7 @@ export default {
 		// 获取分页数据
 		findPage: function (page) {
 			let params = Util.stringify({page:page,size:5});
-			this.$api.role.findAll(params).then(Util.response).then(this.onPaging).catch(Util.error);
+			this.$api.role.findAll(params).then(this.onPaging).catch(Util.error);
 		},
 		onPaging(result){
 			this.result = result.data;
@@ -174,7 +174,7 @@ export default {
 			Util.confirm('确定要删除当前记录吗？',row).then(this.doDelete).catch((action)=>{});
 		},
 		doDelete(row){
-				this.$api.role.delete(row.roleId).then(Util.response).then(this.onDelete).catch(Util.error);
+				this.$api.role.delete(row.roleId).then(this.onDelete).catch(Util.error);
 		},
 		onDelete(result){
 			Util.message("删除成功");
@@ -196,7 +196,7 @@ export default {
 			this.$refs.form.validate((valid) => {
 				if (valid) {
 						let params = Object.assign({}, this.role)
-						this.$api.role.create(params).then(Util.response).then(this.onCreate).catch(Util.error);
+						this.$api.role.create(params).then(this.onCreate).catch(Util.error);
 				}
 			})
 		},
@@ -206,7 +206,7 @@ export default {
 		},
 		// 获取数据
 		findModulesBySubSystem: function (subSystemId) {
-			this.$api.module.fetchTree(subSystemId).then(Util.response).then(result => {
+			this.$api.module.fetchTree(subSystemId).then(result => {
         this.moduleTree = result.data;
       });
 		},
@@ -270,7 +270,7 @@ export default {
 					rms.push({roleId: roleId, moduleId: node.moduleId});
 			});
 			
-			this.$api.roleModule.create(roleId,rms).then(Util.response).then(this.onRoleModule).catch(Util.error);
+			this.$api.roleModule.create(roleId,rms).then(this.onRoleModule).catch(Util.error);
 		},
 		onRoleModule(result){
 				Util.message("设置成功");

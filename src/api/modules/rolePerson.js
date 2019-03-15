@@ -5,8 +5,8 @@ import axios from '../axios'
  */
 export default{
  //创建
- create: (roleId,params) => {
-    return axios({url:`/api/role-person/create/${roleId}`,method:'post',data: params})
+ create: (personId,params) => {
+    return axios({url:`/api/role-person/create/${personId}`,method:'post',data: params})
   },
 
   //修改
@@ -25,5 +25,8 @@ export default{
 
   findAllByRoleId:params => {
     return axios({url:`/api/role-person/find-all-by-role-id/${params}`,data:params});
+  },
+  findRolesByPersonId:params => {
+    return axios({url:`/api/role-person/find-roles-by-person-id/${params}`,data:params});
   }
 }

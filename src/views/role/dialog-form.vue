@@ -72,7 +72,7 @@ export default {
     doCreate() {
       let params = this.buildParam();
       Util.clean(params);
-      this.$api.role.create(params).then(Util.response).then(this.onCreate).catch(Util.error);
+      this.$api.role.create(params).then(this.onCreate).catch(Util.error);
     },
     onCreate(result) {
       this.$emit("onCreate", result.data);
@@ -90,7 +90,7 @@ export default {
     doUpdate() {
       let params = this.buildParam();
       Util.clean(params);
-      this.$api.role.update(params).then(Util.response).then(this.onModify).catch(Util.error);
+      this.$api.role.update(params).then(this.onModify).catch(Util.error);
     },
     onModify(result) {
       //通知parent，创建成功消息

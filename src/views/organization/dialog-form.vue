@@ -87,7 +87,7 @@ export default {
       }
       // that.loading = true;
       this.$api.organization.create(that.organization)
-        .then(Util.response)
+        
         .then(that.onCreate)
         .catch(Util.error);
     },
@@ -113,7 +113,7 @@ export default {
         param.isLeaf = "0";
       }
       this.$api.organization.update(param)
-        .then(Util.response)
+        
         .then(that.onModify)
         .catch(Util.error);
     },

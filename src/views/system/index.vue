@@ -235,7 +235,7 @@ export default {
       //Util.alert(`${row.fullName}`);
       // let organization = this.$refs.tree.getCurrentNode();
        that.$api.subSystem.delete(row.subSystemId)
-        .then(Util.response)
+        
         .then(this.onDeleteNode)
         .catch(Util.error);
     },
@@ -264,7 +264,7 @@ export default {
       let that = this;
       let params = selections.map(item => item.subSystemId).toString();
       that.$api.subSystem.deleteBatch(params.split(","))
-        .then(Util.response)
+        
         .then(that.onBatchDelete)
         .catch(Util.error);
     },

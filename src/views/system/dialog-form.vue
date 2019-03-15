@@ -77,7 +77,7 @@ export default {
       }
       // that.loading = true;
       that.$api.subSystem.create(that.subSystem)
-        .then(Util.response)
+        
         .then(that.onCreate)
         .catch(Util.error);
     },
@@ -97,7 +97,7 @@ export default {
     doUpdate() {
       let that = this;      
       that.$api.subSystem.update(that.subSystem)
-        .then(Util.response)
+        
         .then(that.onModify)
         .catch(Util.error);
     },

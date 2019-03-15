@@ -19,11 +19,11 @@
             <el-input v-model="person.lastName"></el-input>
           </el-form-item>
           
-          <el-form-item label="账号" prop="accountCode">
+          <el-form-item label="账号" prop="account.accountCode">
             <el-input v-model="person.account.accountCode"></el-input>
           </el-form-item>
           
-          <el-form-item label="密码" prop="password">
+          <el-form-item label="密码" prop="account.password">
             <el-input v-model="person.account.password"></el-input>
           </el-form-item>
 
@@ -67,8 +67,8 @@ export default {
       validate: {
         firstName: [{ required: true, message: "请输入姓", trigger: "blur" }],
         lastName: [{ required: true, message: "请输入名", trigger: "blur" }],
-        accountCode:[{ required: true, message: "请输入账号", trigger: "blur" }],
-        password:[{ required: true, message: "请输入密码", trigger: "blur" }],
+        'account.accountCode':[{ required: true, message: "请输入账号", trigger: "blur" }],
+        'account.password':[{ required: true, message: "请输入密码", trigger: "blur" }],
       }
     };
   },
@@ -97,8 +97,7 @@ export default {
       }
       that.person.fullName = that.person.firstName + that.person.lastName;
       // that.loading = true;
-     that.$api.person.create(that.person)
-        .then(Util.response)
+     that.$api.person.create(that.person)        
         .then(that.onCreate)
         .catch(Util.error);
     },
@@ -118,7 +117,7 @@ export default {
     doUpdate() {
       let that = this;      
      that.$api.person.update(that.person)
-        .then(Util.response)
+        
         .then(that.onModify)
         .catch(Util.error);
     },
