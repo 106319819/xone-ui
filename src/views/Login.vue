@@ -10,17 +10,17 @@
     </el-form-item>
     <!--<el-checkbox v-model="checked" checked class="remember">记住密码</el-checkbox>-->
     <el-form-item style="width:100%;">
-      <el-button type="primary" style="width:100%;" @click.native.prevent="handleLogin" :loading="loading">登录</el-button>
+      <el-button type="primary" style="width:100%;" @click.native.prevent="handleLogin" >登录</el-button>
     </el-form-item>
   </el-form>
 </template>
 
 <script>
 import Cookies from "js-cookie"
+import Util from '../common/util';
   export default {
     data() {
       return {
-        loading: false,
         account: {
           username: 'webmaster',
           pwd: '123456'
@@ -43,34 +43,23 @@ import Cookies from "js-cookie"
         let that = this;
         this.$refs.AccountFrom.validate((valid) => {
           if (valid) {
-            this.loading = true;
             let loginParams = {accountCode: this.account.username, password: this.account.pwd};
-            this.$api.user.login(loginParams).then(function (result) {
-              that.loading = false;
-              if (result && result.data) {
-                 localStorage.setItem('token', JSON.stringify(result));
+            this.$api.user.login(loginParams).then(this.onLogin).catch(Util.error);
+          }
+        });
+      },
+      onLogin(result){
+        let data = result.data;
+        let token = JSON.stringify(data);
+        localStorage.setItem('token', token);
 //                that.$store.commit('SET_ROUTERS', user.permissions)
 //                that.$router.addRoutes(that.$store.getters.addRouters);
 //                that.$router.options.routes = that.$store.getters.routers;
-                  Cookies.set('token', JSON.stringify(result)) // 放置token到Cookie
+        Cookies.set('token', data.token); // 放置token到Cookie
             // sessionStorage.setItem('user', userInfo.account) // 保存用户到本地会话
             // this.$store.commit('menuRouteLoaded', false) // 要求重新加载导航菜单
             // this.$router.push('/')  // 登录成功，跳转到主页
-
-               that.$router.push({path: '/'});
-              } else {
-                that.$message.error({showClose: true, message: result.errmsg || '登录失败', duration: 2000});
-              }
-            }, function (err) {
-              that.loading = false;
-              that.$message.error({showClose: true, message: err.toString(), duration: 2000});
-            }).catch(function (error) {
-              that.loading = false;
-              console.log(error);
-              that.$message.error({showClose: true, message: '请求出现异常', duration: 2000});
-            });
-          }
-        });
+        this.$router.push({path: '/'});
       }
     }
   }

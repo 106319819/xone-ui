@@ -72,7 +72,8 @@
 
 <script>
 
-  export default {
+import Cookies from "js-cookie"
+export default {
     name: 'home',
     created(){
       // this.$api.$on('setNickName', (text) => {
@@ -111,19 +112,23 @@
           confirmButtonClass: 'el-button--warning'
         }).then(() => {
           //确认
-          that.loading = true;
-          this.$api.user.logout().then(function (result) {
-            that.loading = false;
-            localStorage.removeItem('token');
-            that.$router.go('/login'); //用go刷新
-          }, function (err) {
-            that.loading = false;
-            that.$message.error({showClose: true, message: err.toString(), duration: 2000});
-          }).catch(function (error) {
-            that.loading = false;
-            console.log(error);
-            that.$message.error({showClose: true, message: '请求出现异常', duration: 2000});
-          });
+           localStorage.removeItem('token');
+          //  Cookies.removeItem('token') ;
+           that.$router.go('/login'); //用go刷新
+
+          // that.loading = true;
+          // this.$api.user.logout().then(function (result) {
+          //   that.loading = false;
+          //   localStorage.removeItem('token');
+          //   that.$router.go('/login'); //用go刷新
+          // }, function (err) {
+          //   that.loading = false;
+          //   that.$message.error({showClose: true, message: err.toString(), duration: 2000});
+          // }).catch(function (error) {
+          //   that.loading = false;
+          //   console.log(error);
+          //   that.$message.error({showClose: true, message: '请求出现异常', duration: 2000});
+          // });
         }).catch(() => {});
       }
     },

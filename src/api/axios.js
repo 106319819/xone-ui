@@ -24,7 +24,7 @@ export default function $axios(options) {
         // console.log('准备发送请求...')
         // 2. 带上token
         if (token) {
-          config.headers.token = token
+          config.headers.Authorization = token
         } else {
           // 重定向到登录页面
           router.push('/login')
@@ -101,8 +101,7 @@ export default function $axios(options) {
         if (err && err.response) {
           switch (err.response.status) {
             case 400:
-              err.message = '请求错误'
-              break
+              err.message = '请求错误';break;
             case 401:
               err.message = '未授权，请登录'
               break
