@@ -11,7 +11,7 @@ export default {
    * @return {Boolean}
    */
   nvl: function (v) {
-    if ("" === v || null === v || "null" === v || undefined === v) {
+    if ("" === v || null === v || "null" === v || undefined === v || "undefined" === v) {
       return true;
     }
 

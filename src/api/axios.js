@@ -11,7 +11,7 @@ export default function $axios(options) {
     const instance = axios.create({
       baseURL: config.baseUrl,
       headers: config.headers,
-      timeout: config.timeout,
+      // timeout: config.timeout,
       withCredentials: config.withCredentials
     })
 
@@ -23,7 +23,7 @@ export default function $axios(options) {
         // console.log(store.state.loading)
         // console.log('准备发送请求...')
         // 2. 带上token
-        if (token) {
+        if (!Util.nvl(token)) {
           config.headers.Authorization = token;
         } else {
           // 重定向到登录页面
