@@ -18,16 +18,16 @@ export default function $axios(options) {
     // request 拦截器
     instance.interceptors.request.use(
       config => {
-        let token = Cookies.get('token')
+        let token = Cookies.get('token');
         // 1. 请求开始的时候可以结合 vuex 开启全屏 loading 动画
         // console.log(store.state.loading)
         // console.log('准备发送请求...')
         // 2. 带上token
         if (token) {
-          config.headers.Authorization = token
+          config.headers.Authorization = token;
         } else {
           // 重定向到登录页面
-          router.push('/login')
+          router.push('/login');
         }
         // 3. 根据请求方法，序列化传来的参数，根据后端需求是否序列化
         if (config.method === 'post') {
