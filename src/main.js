@@ -5,6 +5,7 @@ import App from './App'
 import router from './router'
 import ElementUI from 'element-ui'
 import api from './api'
+import store from './store'
 import 'element-ui/lib/theme-chalk/index.css'
 import '@/assets/styles/iconfont.css'
 import '@/assets/styles/main.scss'
@@ -16,6 +17,7 @@ Vue.use(api)
 new Vue({
   el: '#app',
   router,
+  store,
   template: '<App/>',
   components: {App}
 })

@@ -30,14 +30,9 @@ export default {
         path = menu.url
       }
       // 通过菜单URL跳转至指定路由
-      this.$router.push("/" + path)
+      this.$router.push(path)
     }
   }
 }
 </script>
 
-<style scoped lang="scss">
-// .el-submenu, .el-menu-item {
-//   background-color: #3c4b5a44;
-// }
-</style>

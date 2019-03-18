@@ -1,10 +1,9 @@
-
 <template>
 	<div class="menu-bar-container">
     <!-- logo -->
     <div class="logo" :style="{'background-color':themeColor}" :class="collapse?'menu-bar-collapse-width':'menu-bar-width'"
       @click="$router.push('/')">
-        <img v-if="collapse" src="@/assets/logo.png"/> <div>{{collapse?'':appName}}</div>
+        <img v-if="collapse" :src="require('@/assets/user.png')" /> <div>{{collapse?'':appName}}</div>
     </div>
     <!-- 导航菜单 -->
     <el-menu ref="navmenu" default-active="1" :class="collapse?'menu-bar-collapse-width':'menu-bar-width'"
@@ -18,7 +17,7 @@
 
 <script>
 import { mapState } from 'vuex'
-import MenuTree from "@/components/MenuTree"
+import MenuTree from "./menu-tree"
 export default {
   components:{
         MenuTree
@@ -55,6 +54,7 @@ export default {
     handleselect(a, b) {
       console.log('handleselect')
     },
+
     // 路由操作处理
     handleRoute (route) {
       // tab标签页选中, 如果不存在则先添加

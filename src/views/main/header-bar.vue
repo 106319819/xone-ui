@@ -3,19 +3,19 @@
   <div class="headbar" :style="{'background':themeColor}" 
     :class="$store.state.app.collapse?'position-collapse-left':'position-left'">
     <!-- 导航收缩 -->
-    <span class="hamburg">
+    <span class="slider-button">
       <el-menu class="el-menu-demo" :background-color="themeColor" text-color="#fff" :active-text-color="themeColor" mode="horizontal">
-        <el-menu-item index="1" @click="onCollapse"><hamburger :isActive="collapse"></hamburger></el-menu-item>
+        <el-menu-item index="1" @click="onCollapse"><slider-button :isActive="collapse"></slider-button></el-menu-item>
       </el-menu>
     </span>
     <!-- 导航菜单 -->
     <span class="navbar">
       <el-menu :default-active="activeIndex" class="el-menu-demo" 
           :background-color="themeColor" text-color="#fff" active-text-color="#ffd04b" mode="horizontal" @select="selectNavBar()">
-        <el-menu-item index="1" @click="$router.push('/')"><i class="fa fa-home fa-lg"></i>  </el-menu-item>
-        <el-menu-item index="2" @click="openWindow('https://gitee.com/liuge1988/kitty')">{{$t("common.projectRepo")}}</el-menu-item>
-        <el-menu-item index="3" @click="openWindow('https://gitee.com/liuge1988/kitty/wikis/Home')">{{$t("common.doc")}}</el-menu-item>
-        <el-menu-item index="4" @click="openWindow('https://www.cnblogs.com/xifengxiaoma/')">{{$t("common.blog")}}</el-menu-item>
+        <el-menu-item index="1" @click="$router.push('/')"><i class="fa fa-home fa-lg"></i>home </el-menu-item>
+        <el-menu-item index="2" @click="openWindow('https://github.com/106319819/xone')">xone home</el-menu-item>
+        <!-- <el-menu-item index="3" @click="openWindow('https://gitee.com/liuge1988/kitty/wikis/Home')">{{$t("common.doc")}}</el-menu-item> -->
+        <el-menu-item index="4" @click="openWindow('https://www.cnblogs.com/xifengxiaoma/')">xone-ui</el-menu-item>
       </el-menu>
     </span>
     <!-- 工具栏 -->
@@ -23,11 +23,11 @@
       <el-menu class="el-menu-demo" :background-color="themeColor" :text-color="themeColor" :active-text-color="themeColor" mode="horizontal">
         <el-menu-item index="1">
           <!-- 主题切换 -->
-          <theme-picker class="theme-picker" :default="themeColor" @onThemeChange="onThemeChange"></theme-picker>
+          <theme-picker class="theme-picker" :default="themeColor" @onThemeChange="onThemeChange">换肤</theme-picker>
         </el-menu-item>
         <el-menu-item index="2" v-popover:popover-lang>
           <!-- 语言切换 -->
-          <li style="color:#fff;" class="fa fa-language fa-lg"></li>
+          <i class="el-icon-time"></i>
           <el-popover ref="popover-lang" placement="bottom-start" trigger="click" v-model="langVisible">
             <div class="lang-item" @click="changeLanguage('zh_cn')">简体中文</div>
             <div class="lang-item" @click="changeLanguage('en_us')">English</div>
@@ -36,7 +36,7 @@
         <el-menu-item index="3" v-popover:popover-message>
           <!-- 我的私信 -->
           <el-badge :value="5" :max="99" class="badge" type="success">
-            <li style="color:#fff;" class="fa fa-envelope-o fa-lg"></li>
+            <i class="el-icon-message"></i>
           </el-badge>
           <el-popover ref="popover-message" placement="bottom-end" trigger="click">
             <message-panel></message-panel>
@@ -45,7 +45,7 @@
         <el-menu-item index="4" v-popover:popover-notice>
           <!-- 系统通知 -->
           <el-badge :value="4" :max="99" class="badge" type="success">
-            <li style="color:#fff;" class="fa fa-bell-o fa-lg"></li>
+           <i class="el-icon-info"></i>
           </el-badge>
           <el-popover ref="popover-notice" placement="bottom-end" trigger="click">
             <notice-panel></notice-panel>
@@ -53,7 +53,7 @@
         </el-menu-item>
         <el-menu-item index="5" v-popover:popover-personal>
           <!-- 用户信息 -->
-          <span class="user-info"><img :src="user.avatar" />{{user.name}}</span>
+          <span class="user-info"><img :src="require('@/assets/user.png')" />{{user.accountCode}}</span>
           <el-popover ref="popover-personal" placement="bottom-end" trigger="click" :visible-arrow="false">
             <personal-panel :user="user"></personal-panel>
           </el-popover>
@@ -65,31 +65,31 @@
 
 <script>
 import { mapState } from 'vuex'
-import mock from "@/mock/index"
-import Hamburger from "@/components/Hamburger"
-import ThemePicker from "@/components/ThemePicker"
-import LangSelector from "@/components/LangSelector"
-import Action from "@/components/Toolbar/Action"
-import NoticePanel from "@/views/Core/NoticePanel"
-import MessagePanel from "@/views/Core/MessagePanel"
-import PersonalPanel from "@/views/Core/PersonalPanel"
+// import mock from "@/mock/index"
+import SliderButton from "./slider-button"
+import ThemePicker from "./theme-picker"
+import LangSelector from "./lang-selector"
+// import Action from "./action"
+ import NoticePanel from "./notice-panel"
+ import MessagePanel from "./message-panel"
+ import PersonalPanel from "./personal-panel"
 export default {
   components:{
-        Hamburger,
-        ThemePicker,
-        LangSelector,
-        Action,
-        NoticePanel,
-        MessagePanel,
-        PersonalPanel
+         "slider-button":SliderButton,
+        "theme-picker":ThemePicker,
+        "lang-selector": LangSelector,
+        // "action": Action,
+        "notice-panel": NoticePanel,
+        "message-panel": MessagePanel,
+        "personal-panel": PersonalPanel
   },
   data() {
     return {
       user: {
-        name: "Louis",
+        name: "webmaster",
         avatar: "",
         role: "超级管理员",
-        registeInfo: "注册时间：2018-12-20 "
+        registeInfo: "注册时间：2018 "
       },
       activeIndex: '1',
       langVisible: false
@@ -118,7 +118,7 @@ export default {
     }
   },
   mounted() {
-    this.sysName = "Kitty Platform"
+    this.sysName = "xone Platform"
     var user = sessionStorage.getItem("user")
     if (user) {
       this.user.name = user
@@ -146,7 +146,7 @@ export default {
   border-left-width: 1px;
   border-left-style: solid;
 }
-.hamburg, .navbar {
+.slider-button, .navbar {
   float: left;
 }
 .toolbar {
@@ -161,7 +161,7 @@ export default {
 }
 .lang-item:hover {
   font-size: 18px;
-  background: #b0d6ce4d;
+  background: #ffffff;
 }
 .user-info {
   font-size: 20px;
@@ -183,5 +183,8 @@ export default {
 }
 .position-collapse-left {
   left: 65px;
+}
+.action:hover {
+  background: #fff;
 }
 </style>
