@@ -132,10 +132,10 @@ router.beforeEach((to, from, next) => {
   // console.log('to:' + to.path)
   // 登录界面登录成功之后，会把用户信息保存在会话
   if (to.path.startsWith('/login')) {
-    window.localStorage.removeItem('token')
+    sessionStorage.removeItem('token')
     next();
   } else {
-    let user = JSON.parse(window.localStorage.getItem('token'));
+    let user = JSON.parse(sessionStorage.getItem('token'));
     if (!user) {
       next({path: '/login'});
     } else {
@@ -234,11 +234,12 @@ function addDynamicRoutes (menuList = [], routes = []) {
       let path = iframe.getPath(menuList[i].url);
       if (path) {
         // 如果是嵌套页面, 通过iframe展示
-        route['path'] = path
+        route['path'] = `/${path}`;
         route['component'] = resolve => require([`@/views/main/iframe`], resolve)
+        // route['component'] = resolve => require([`@/views/main/html-panel`], resolve)
         // 存储嵌套页面路由路径和访问URL
         let url = iframe.getUrl(menuList[i].url);
-        let iFrameUrl = {'path':path, 'url':url}
+        let iFrameUrl = {'path':`/${path}`, 'url':url}
         store.commit('addIFrameUrl', iFrameUrl)
       } else {
        try {

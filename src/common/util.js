@@ -49,7 +49,10 @@ export default {
   nbsp: function (v) {
     return ("" == v || "null" == v || null == v) ? "&nbsp;" : v;
   },
-
+  isNumber(str){
+   //判断字符串是否为数字 //判断正整数 /^[1-9]+[0-9]*]*$/ 
+　　return (/^[0-9]+.?[0-9]*$/).test(str);
+  },
   /**
    * 去除js对象中为空的属性
    * @param {} obj

@@ -28,6 +28,8 @@ export default {
       let path = iframe.getPath(menu.url)
       if(!path) {
         path = menu.url
+      }else{
+        path = '/'+path;
       }
       // 通过菜单URL跳转至指定路由
       this.$router.push(path)

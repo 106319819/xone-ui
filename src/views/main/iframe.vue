@@ -7,11 +7,12 @@
 </template>
 
 <script>
+import Cookies from "js-cookie"
 export default {
   data() {
     return {
       src: "",
-      loading: null
+      loading: false
     };
   },
   methods: {
@@ -25,18 +26,21 @@ export default {
         lock: true,
         text: "loading...",
         spinner: "el-icon-loading",
-        background: "rgba(0, 0, 0, 0.5)",
+        background: "rgba(0, 0, 0, 0.7)",
         // fullscreen: false,
         target: document.querySelector("#main-container ")
       })
     },
     onloaded: function() {
+      // this.loading = false;
       if(this.loading) {
         this.loading.close()
       }
     }
   },
   mounted() {
+        // "jquery": "^3.3.1",
+
     this.resetSrc(this.$store.state.iframe.iframeUrl);
   },
   watch: {

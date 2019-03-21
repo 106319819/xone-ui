@@ -10,7 +10,7 @@ export default {
             state.iframeUrl = iframeUrl
         },
         addIFrameUrl(state, iframeUrl){  // iframeUrls
-            state.iframeUrls.push(iframeUrl)
+            state.iframeUrls.push(iframeUrl);
         }
     },
     actions: {

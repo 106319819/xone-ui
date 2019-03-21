@@ -9,6 +9,9 @@ import { baseUrl } from '@/common/global'
  * @param {*} url
  */
 export default {
+    isUrl(url){
+      return (/^http[s]?:\/\/.*/.test(url));
+    },
     getPath (url) {
       let iframeUrl = ''
       if(/^iframe:.*/.test(url)) {
