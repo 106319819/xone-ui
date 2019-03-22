@@ -4,8 +4,8 @@ import axios from '../axios'
  */
 export default{
  //创建
- create: (roleId,params) => {
-    return axios({url:`/admin/role-module/create/${roleId}`,method:'post',data: params})
+ create: (roleId,subSystemId,params) => {
+    return axios({url:`/admin/role-module/create/${roleId}/${subSystemId}`,method:'post',data: params})
   },
 
   //修改

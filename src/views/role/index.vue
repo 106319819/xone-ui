@@ -17,7 +17,7 @@
 	</div>
 	<!--表格内容栏-->
     <el-table :data="result.content" highlight-current-row @selection-change="selectionChange" 
-          @current-change="handleCurrentChange" style="width:100%;" >
+          @row-click ="onRowClick" style="width:100%;" >
       <el-table-column type="selection" width="40" ></el-table-column>
       <el-table-column v-for="column in columns" header-align="center" align="center"
         :prop="column.prop" :label="column.label" :width="column.width" :min-width="column.minWidth" 
@@ -165,9 +165,9 @@ export default {
 				this.selections = selections;
 		},
 		// 角色选择切换
-    handleCurrentChange(current,old) {
-			this.selectRole = current;
-			this.onRoleSelectChange(current);
+    onRowClick(row,column, event) {
+			this.selectRole = row;
+			this.onRoleSelectChange(row);
     },
 		// 批量删除
 		handleDelete: function (row) {
@@ -270,7 +270,7 @@ export default {
 					rms.push({roleId: roleId, moduleId: node.moduleId});
 			});
 			
-			this.$api.roleModule.create(roleId,rms).then(this.onRoleModule).catch(Util.error);
+			this.$api.roleModule.create(roleId,this.subSystemId,rms).then(this.onRoleModule).catch(Util.error);
 		},
 		onRoleModule(result){
 				Util.message("设置成功");
