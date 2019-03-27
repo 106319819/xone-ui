@@ -235,8 +235,8 @@ function addDynamicRoutes (menuList = [], routes = []) {
       if (path) {
         // 如果是嵌套页面, 通过iframe展示
         route['path'] = `/${path}`;
-        route['component'] = resolve => require([`@/views/main/iframe`], resolve)
-        // route['component'] = resolve => require([`@/views/main/html-panel`], resolve)
+        // route['component'] = resolve => require([`@/views/main/iframe`], resolve)
+        route['component'] = resolve => require([`@/views/main/html-panel`], resolve)
         // 存储嵌套页面路由路径和访问URL
         let url = iframe.getUrl(menuList[i].url);
         let iFrameUrl = {'path':`/${path}`, 'url':url}

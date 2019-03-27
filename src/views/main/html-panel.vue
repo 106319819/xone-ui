@@ -1,53 +1,75 @@
+
 <template>
- <el-row class="iframe-container" >
-    <p v-loading="loading" ></p>
-    <iframe id="iframe" :src = "src" scrolling="auto"  frameborder="0" class="frame" :onload="onloaded()"></iframe>
-  </el-row>
+  <div class="iframe-container">
+    <iframe :src="src" scrolling="auto" frameborder="0" id="iframe" class="frame" :onload="onloaded()">
+    </iframe>
+  </div>
 </template>
 
 <script>
-import axios from "@/api/axios"
-import util from '../../common/util';
-import Cookies from "js-cookie";
- export default{
-  // 使用时请使用 :url.sync=""传值
-  data () {
-   return {
-    loading: false,
-    src: ''
-   }
-  },
-  mounted() {
-    // this.resetSrc(this.$store.state.iframe.iframeUrl);
-    this.load(this.$store.state.iframe.iframeUrl)
+import Cookies from "js-cookie"
+export default {
+  data() {
+    return {
+      src: "",
+      loading: false
+    };
   },
   methods: {
-    load (url) {
-      // let token = Cookies.get('token');
-        // 1. 请求开始的时候可以结合 vuex 开启全屏 loading 动画
-        // console.log(store.state.loading)
-        // console.log('准备发送请求...')
-        // 2. 带上token
-      this.src = url;// + "?Authorization=" + token;
-      // 加载中
-      // this.loading = true
-      // axios({url:url, method:'get'}).then((response) => {
-      // document.getElementById('iframe').contentWindow.document.write(response.data) ;
-      // // 处理HTML显示
-      // // this.html = "data:text/html;charset=utf-8," + escape(response.data);
-      // }).catch((error) => {
-        
-      // this.loading = false
-      // this.html = JSON.stringify(error);
-      // });
+    // 获取路径
+    resetSrc: function(url) {
+      this.src = url
+      this.load()
     },
-    onloaded(){
-      this.loading = false
+    load: function() {
+      this.loading = this.$loading({  
+        lock: true,
+        text: "loading...",
+        spinner: "el-icon-loading",
+        background: "rgba(0, 0, 0, 0.7)",
+        // fullscreen: false,
+        target: document.querySelector("#main-container ")
+      });
+
+        let user = sessionStorage.getItem('token');
+    let iframe = document.getElementById("iframe");
+    if(iframe){
+      iframe.contentWindow.postMessage(user, "*");
+    }
+    },
+    onloaded: function() {
+      // this.loading = false;
+      
+      if(this.loading) {
+        this.loading.close()
+      }
+              
+    }
+  },
+  created(){
+    
+    let user = sessionStorage.getItem('token');
+    let iframe = document.getElementById("iframe");
+    if(iframe){
+      iframe.contentWindow.postMessage(user, "*");
+    }
+    
+
+  },
+  mounted() {
+        // "jquery": "^3.3.1",
+    this.resetSrc(this.$store.state.iframe.iframeUrl);
+  },
+  watch: {
+    $route: {
+      handler: function(val, oldVal) {
+        // 如果是跳转到嵌套页面，切换iframe的url
+        this.resetSrc(this.$store.state.iframe.iframeUrl);
+      }
     }
   }
- }
+};
 </script>
-
 
 <style lang="scss">
 .iframe-container {
