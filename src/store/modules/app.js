@@ -5,7 +5,7 @@ export default {
         oldThemeColor: "#14889A",   // 上一次主题颜色
         collapse:false,  // 导航栏收缩状态
         menuRouteLoaded:false,
-        routers:[]    // 子系统的菜单和路由数据
+        modules:[]    // 子系统的菜单模块
     },
     getters: {
         collapse(state){// 对应着上面state
@@ -20,19 +20,19 @@ export default {
             state.oldThemeColor = state.themeColor
             state.themeColor = themeColor
         },
-        setSubSystemRouter(state, router){  // 改变菜单和路由的加载状态
+        setSubSystemModule(state, data){  // 改变菜单和路由的加载状态
             let exists = false;
-            for(let i=0; i<state.routers.length; i++){
-                let item = state.routers[i];
-                if(item.subSystemId == router.subSystemId ){
-                    state.routers[i] = rotuer;
+            for(let i=0; i<state.modules.length; i++){
+                let item = state.modules[i];
+                if(item.subSystemId == data.subSystemId ){
+                    state.modules[i] = data;
                     exists = true;
                     break;
                 }
             }
 
             if(!exists){
-                state.routers.push(router);
+                state.modules.push(data);
             }
             
             //state.menuRouteLoaded = menuRouteLoaded;

@@ -3,9 +3,9 @@
       <!-- 导航菜单栏 -->
       <navigate-bar></navigate-bar>
       <!-- 头部区域 -->
-      <header-bar></header-bar>
+      <header-bar @closeAll="onCloseAll"></header-bar>
       <!-- 主内容区域 -->
-      <main-content></main-content>
+      <main-content ref="main-content"></main-content>
   </div>
 </template>
 
@@ -18,6 +18,15 @@ export default {
         "header-bar":HeaderBar,
         "navigate-bar":NavigateBar,
         "main-content":MainContent
+  },
+  mounted(){
+    // this.$on
+    // this.$on('closeAll',this.onCloseAll);
+  },
+  methods:{
+    onCloseAll(){
+      // this.$refs["main-content"].tabsCloseAllHandle();
+    }
   }
 };
 </script>

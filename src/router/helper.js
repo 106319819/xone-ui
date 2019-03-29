@@ -14,28 +14,37 @@ export default {
     this.loadSubSystemModules(user, user.subSystems[0]);
   },
   loadSubSystemModules(user, subSystem) {
-    for (let i = 0; i < store.state.app.routers.length; i++) {
-      let item = store.state.app.routers[i];
+    for (let i = 0; i < store.state.app.modules.length; i++) {
+      let item = store.state.app.modules[i];
       if (item.subSystemId == subSystem.subSystemId) {
          // 处理静态组件绑定路由
-        this.handleStaticComponent(router, subSystem.routers);
-        router.addRoutes(router.options.routes);
+        // this.handleStaticComponent(router, item.routers);
+        // router.addRoutes(router.options.routes);
+
+          // 添加动态路由
+        let dynamicRoutes = this.addDynamicRoutes(item.modules);
+        // 处理静态组件绑定路由
+        this.handleStaticComponent(router, dynamicRoutes);
+        router.addRoutes(router.options.routes);     
+        // 保存菜单树
+        store.commit('setNavTree', item.modules);
+
        return;
       }
     }
 
-    api.module.fetchTree(user.personId, subSystem.subSystemId).then(result => {
+    api.module.fetchTreeByOwner(user.personId, subSystem.subSystemId).then(result => {
       // 添加动态路由
       let dynamicRoutes = this.addDynamicRoutes(result.data);
       // 处理静态组件绑定路由
       this.handleStaticComponent(router, dynamicRoutes);
       router.addRoutes(router.options.routes);
       // 保存加载状态
-      let subSystemRouter = {
+      let subSystemModule = {
         subSystemId: subSystem.subSystemId,
-        routers: dynamicRoutes
+        modules: result.data
       }
-      store.commit('setSubSystemRouter', subSystemRouter);
+      store.commit('setSubSystemModule', subSystemModule);
       // 保存菜单树
       store.commit('setNavTree', result.data);
     }).catch(Util.error);

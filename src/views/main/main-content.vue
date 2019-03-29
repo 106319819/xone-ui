@@ -90,6 +90,9 @@ export default {
         this.$router.push({ name: tempTabName })
       })
     }
+  },
+  mounted(){
+    //this.$on('closeAll',this.tabsCloseAllHandle);
   }
 }
 </script>
