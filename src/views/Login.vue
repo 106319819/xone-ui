@@ -50,9 +50,9 @@ import Util from '../common/util';
       },
       onLogin(result){
         let data = result.data;
-        let token = JSON.stringify(data);
+        let user = JSON.stringify(data);
         // localStorage.setItem('token', token);
-        sessionStorage.setItem('token', token);
+        sessionStorage.setItem('user', user);
 //                that.$store.commit('SET_ROUTERS', user.permissions)
 //                that.$router.addRoutes(that.$store.getters.addRouters);
 //                that.$router.options.routes = that.$store.getters.routers;

@@ -38,5 +38,9 @@ export default{
   fetchTreeByPersonId: personId => {
     return axios({url:`/admin/module/fetch-tree-by-person-id/${personId}`,method:'get',data: personId})
   },
+  fetchTree: (personId,subSystemId) => {
+    return axios({url:`/admin/module/fetch-tree`,
+      method:'get',params: {personId: personId,subSystemId:subSystemId}});
+  },
   
 }

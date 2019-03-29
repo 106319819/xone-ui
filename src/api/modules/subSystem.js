@@ -28,4 +28,8 @@ export default {
   deleteBatch: params => {
     return axios({url:`/admin/sub-system/delete-batch`,method:'post',data: params})
   },
+  findByPersonId: personId =>{
+    return axios({url:`/admin/sub-system/find-by-person-id/${personId}`,method:'get'});
+  }
+  
 }

@@ -5,12 +5,12 @@
           <img class="avatar" :src="require('@/assets/user.png')" />
         </div>  
         <div class="name-role">
-          <span class="sender">{{ user.name }} - {{ user.role }}</span>  
+          <span class="sender">{{ user.fullName }} - {{ user.accountCode }}</span>  
         </div>  
         <div class="registe-info">
           <span class="registe-info">
             <li class="fa fa-clock-o"></li>
-            {{ user.registeInfo }}
+            <!-- {{ user.token }} -->
           </span>
         </div>  
     </div>
@@ -28,6 +28,11 @@
         </span>    
     </div>
     <div class="other-operation">
+      <div class="other-operation-item" v-for="subSystem in user.subSystems" @click="onSubSystem(subSystem)">
+          <i class="el-icon-upload"></i>
+            {{subSystem.name}}
+        </div>  
+
         <div class="other-operation-item">
           <i class="el-icon-delete"></i>
           清除缓存
@@ -44,6 +49,7 @@
           <i class="el-icon-upload"></i>
           备份还原
         </div>    
+          
     </div>
     <div class="personal-footer" @click="logout">
       <i class="el-icon-close"></i>
@@ -56,21 +62,15 @@
 
 <script>
 // import Backup from "@/views/Backup/Backup"
+import Util from "../../common/util.js";
+import Helper from "../../router/helper.js"
 export default {
   name: 'PersonalPanel',
   components:{
     // Backup
   },
   props: {
-    user: {
-      type: Object,
-      default: {
-        name: "webmaster",
-        avatar: "@/assets/user.png",
-        role: "超级管理员",
-        registeInfo: "注册时间：2019 "
-      }
-    }
+    user: {type: Object,default: {}}
   },
   data() {
     return {
@@ -103,9 +103,15 @@ export default {
         this.$api.login.logout().then((res) => {
           }).catch(function(res) {
         })
+    },
+    
+    onSubSystem(subSystem){
+      // alert("onSubSystem");
+      Helper.loadSubSystemModules(this.user,subSystem);
     }
   },
   mounted() {
+      // this.findSubSystemByPerson();
   }
 }
 </script>

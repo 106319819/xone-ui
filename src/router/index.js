@@ -132,10 +132,10 @@ router.beforeEach((to, from, next) => {
   // console.log('to:' + to.path)
   // 登录界面登录成功之后，会把用户信息保存在会话
   if (to.path.startsWith('/login')) {
-    sessionStorage.removeItem('token')
+    sessionStorage.removeItem('user')
     next();
   } else {
-    let user = JSON.parse(sessionStorage.getItem('token'));
+    let user = JSON.parse(sessionStorage.getItem('user'));
     if (!user) {
       next({path: '/login'});
     } else {
@@ -152,32 +152,45 @@ router.beforeEach((to, from, next) => {
 */
 function addDynamicMenuAndRoutes(user, to, from) {
   // 处理IFrame嵌套页面
-  handleIFrameUrl(to.path)
-  if(store.state.app.menuRouteLoaded) {
-    console.log('动态菜单和路由已经存在.')
-    return;
+  handleIFrameUrl(to.path);
+  loadSubSystemModules(user,user.subSystems[0]);
+  // if(store.state.app.menuRouteLoaded) {
+  //   console.log('动态菜单和路由已经存在.')
+  //   return;
+  // }
+  // api.module.fetchTreeByPersonId(user.personId).then(result => {
+  //   // 添加动态路由
+  //   let dynamicRoutes = addDynamicRoutes(result.data);
+  //   // 处理静态组件绑定路由
+  //   handleStaticComponent(router, dynamicRoutes);
+  //   router.addRoutes(router.options.routes);
+  //   // 保存加载状态
+  //   store.commit('menuRouteLoaded', true);
+  //   // 保存菜单树
+  //   store.commit('setNavTree', result.data);
+  // }).catch(Util.error);
+}
+function loadSubSystemModules(user,subSystem){
+   for(let i=0; i< store.state.app.routers.length; i++){
+      let item = store.state.app.routers[i];
+      if(item.subSystemId == subSystem.subSystemId ){
+        return ;
+      }
   }
-  api.module.fetchTreeByPersonId(user.personId).then(result => {
+
+  api.module.fetchTree(user.personId,subSystem.subSystemId).then(result => {
     // 添加动态路由
     let dynamicRoutes = addDynamicRoutes(result.data);
     // 处理静态组件绑定路由
     handleStaticComponent(router, dynamicRoutes);
     router.addRoutes(router.options.routes);
     // 保存加载状态
-    store.commit('menuRouteLoaded', true);
+    let subSystemRouter = {subSystemId:subSystem.subSystemId,routers: dynamicRoutes}
+    store.commit('setSubSystemRouter', subSystemRouter);
     // 保存菜单树
     store.commit('setNavTree', result.data);
-  })
-  
-  // .then(result => {
-  //   api.user.findPermissions({'name':userName}).then(result => {
-  //     // 保存用户权限标识集合
-  //     store.commit('setPerms', result.data)
-  //   })
-  // })
-  .catch(Util.error);
+  }).catch(Util.error);
 }
-
 /**
  * 处理路由到本地直接指定页面组件的情况
  * 比如'代码生成'是要求直接绑定到'Generator'页面组件
@@ -189,7 +202,8 @@ function handleStaticComponent(router, dynamicRoutes) {
       break;
     }
   }
-  router.options.routes[0].children = router.options.routes[0].children.concat(dynamicRoutes)
+  let home = router.options.routes[0].children.slice(0,1);
+  router.options.routes[0].children = home.concat(dynamicRoutes);
 }
 
 /**
@@ -235,8 +249,8 @@ function addDynamicRoutes (menuList = [], routes = []) {
       if (path) {
         // 如果是嵌套页面, 通过iframe展示
         route['path'] = `/${path}`;
-        // route['component'] = resolve => require([`@/views/main/iframe`], resolve)
-        route['component'] = resolve => require([`@/views/main/html-panel`], resolve)
+        route['component'] = resolve => require([`@/views/main/iframe`], resolve)
+        // route['component'] = resolve => require([`@/views/main/html-panel`], resolve)
         // 存储嵌套页面路由路径和访问URL
         let url = iframe.getUrl(menuList[i].url);
         let iFrameUrl = {'path':`/${path}`, 'url':url}

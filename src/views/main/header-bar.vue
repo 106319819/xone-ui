@@ -73,6 +73,7 @@ import LangSelector from "./lang-selector"
  import NoticePanel from "./notice-panel"
  import MessagePanel from "./message-panel"
  import PersonalPanel from "./personal-panel"
+ import Util from "../../common/util.js";
 export default {
   components:{
          "slider-button":SliderButton,
@@ -85,12 +86,7 @@ export default {
   },
   data() {
     return {
-      user: {
-        name: "webmaster",
-        avatar: "",
-        role: "超级管理员",
-        registeInfo: "注册时间：2018 "
-      },
+      user: {},
       activeIndex: '1',
       langVisible: false
     }
@@ -119,9 +115,9 @@ export default {
   },
   mounted() {
     this.sysName = "xone Platform"
-    var user = sessionStorage.getItem("user")
-    if (user) {
-      this.user.name = user
+
+    this.user = Util.json(sessionStorage.getItem("user"));
+    if (this.user) {
       this.user.avatar = require("@/assets/user.png")
     }
   },

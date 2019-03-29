@@ -4,7 +4,8 @@ export default {
         themeColor: "#333744",  // 主题颜色
         oldThemeColor: "#14889A",   // 上一次主题颜色
         collapse:false,  // 导航栏收缩状态
-        menuRouteLoaded:false    // 菜单和路由是否已经加载
+        menuRouteLoaded:false,
+        routers:[]    // 子系统的菜单和路由数据
     },
     getters: {
         collapse(state){// 对应着上面state
@@ -19,7 +20,24 @@ export default {
             state.oldThemeColor = state.themeColor
             state.themeColor = themeColor
         },
-        menuRouteLoaded(state, menuRouteLoaded){  // 改变菜单和路由的加载状态
+        setSubSystemRouter(state, router){  // 改变菜单和路由的加载状态
+            let exists = false;
+            for(let i=0; i<state.routers.length; i++){
+                let item = state.routers[i];
+                if(item.subSystemId == router.subSystemId ){
+                    state.routers[i] = rotuer;
+                    exists = true;
+                    break;
+                }
+            }
+
+            if(!exists){
+                state.routers.push(router);
+            }
+            
+            //state.menuRouteLoaded = menuRouteLoaded;
+        },
+        menuRouteLoaded(state,menuRouteLoaded){
             state.menuRouteLoaded = menuRouteLoaded;
         }
     },
