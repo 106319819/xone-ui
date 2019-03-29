@@ -15,7 +15,7 @@
         <el-menu-item index="1" @click="$router.push('/')"><i class="fa fa-home fa-lg"></i>home </el-menu-item>
         <el-menu-item index="2" @click="openWindow('https://github.com/106319819/xone')">xone home</el-menu-item>
         <!-- <el-menu-item index="3" @click="openWindow('https://gitee.com/liuge1988/kitty/wikis/Home')">{{$t("common.doc")}}</el-menu-item> -->
-        <el-menu-item index="4" @click="openWindow('https://www.cnblogs.com/xifengxiaoma/')">xone-ui</el-menu-item>
+        <el-menu-item index="4" @click="openWindow('https://github.com/106319819/xone-ui')">xone-ui</el-menu-item>
       </el-menu>
     </span>
     <!-- 工具栏 -->

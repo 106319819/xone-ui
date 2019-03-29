@@ -24,7 +24,6 @@
 │   ├───—components  #组件及页面文件目录
 │   ├───—router  #路由目录
 │   ├───—App.vue #项目入口文件
-│   ├───—bus.js  #公共通信组件
 │   └────main.js  #项目的核心文件
 ├── static  #开发模式下的静态资源目录
 ├── index.html #首页入口文件，你可以添加一些 meta 信息或同统计代码啥的
@@ -49,7 +48,7 @@
 可以直接在git上下载项目源码。
 或者通过git命令下载
 #git命令下载
-git clone https://github.com/106319819/birip-ui.git
+git clone https://github.com/106319819/xone-ui.git
 
 假定项目已经下载下来了。
 
@@ -57,7 +56,7 @@ git clone https://github.com/106319819/birip-ui.git
 
 （1）新开一个命令行窗口
 （2）定位到项目目录并安装依赖
-  > cd 你自己的位置/birip-ui
+  > cd 你自己的位置/xone-ui
   > npm install
 （3）依赖安装成功后执行启动命令
   > npm run dev
