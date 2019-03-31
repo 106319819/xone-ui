@@ -10,6 +10,7 @@ import module from './modules/module'
 import role from './modules/role'
 import roleModule from './modules/roleModule'
 import rolePerson from './modules/rolePerson'
+import host from './modules/host'
 
 // 默认全部导出
 export default {
@@ -20,5 +21,6 @@ export default {
     module,
     role,
     roleModule,
-    rolePerson
+    rolePerson,
+    host
 }

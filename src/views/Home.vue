@@ -133,10 +133,10 @@ export default {
       }
     },
     mounted() {
-      let user = localStorage.getItem('token');
+      let user = sessionStorage.getItem('user');
       if (user) {
         user = JSON.parse(user);
-        this.nickname = user.nickname || '';
+        this.nickname = user.fullName || '';
       }
     }
   }

@@ -16,6 +16,7 @@ import OrganizationEdit from '@/views/organization/edit-form'
 
 import ModuleIndex from '@/views/module/index'
 import RoleIndex from '@/views/role/index'
+import HostIndex from '@/views/host/index'
 
 import Helper from './helper.js'
 // 懒加载方式，当路由被访问的时候才加载对应组件
@@ -99,6 +100,17 @@ let router = new Router({
       iconCls: 'iconfont icon-qunzu_o', // 图标样式class
       children: [
         {path: '/role/index', component: RoleIndex, name: '角色列表', menuShow: true}
+      ]
+    },
+    {
+      path: '/',
+      component: Home,
+      name: '平台变量管理',
+      menuShow: true,
+      leaf: true, // 只有一个节点
+      iconCls: 'iconfont icon-qunzu_o', // 图标样式class
+      children: [
+        {path: '/host/index', component: HostIndex, name: '平台变量', menuShow: true}
       ]
     },
     {
