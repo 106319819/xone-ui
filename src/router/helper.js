@@ -11,9 +11,17 @@ export default {
   addDynamicMenuAndRoutes(user, to, from) {
     // 处理IFrame嵌套页面
     this.handleIFrameUrl(to.path);
-    this.loadSubSystemModules(user, user.subSystems[0]);
+    let subSystem = store.state.app.subSystem;
+    if(!("subSystemId" in subSystem)){
+      //默认为第一个子系统
+      subSystem = user.subSystems[0];
+    }
+    this.loadSubSystemModules(user, subSystem);
   },
   loadSubSystemModules(user, subSystem) {
+    //设置当前子系统
+    store.commit('setSubSystem', subSystem);
+
     for (let i = 0; i < store.state.app.modules.length; i++) {
       let item = store.state.app.modules[i];
       if (item.subSystemId == subSystem.subSystemId) {
@@ -25,10 +33,11 @@ export default {
         let dynamicRoutes = this.addDynamicRoutes(item.modules);
         // 处理静态组件绑定路由
         this.handleStaticComponent(router, dynamicRoutes);
+        
         router.addRoutes(router.options.routes);     
         // 保存菜单树
         store.commit('setNavTree', item.modules);
-
+        
        return;
       }
     }

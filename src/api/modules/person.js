@@ -26,4 +26,19 @@ export default {
   deleteBatch: params => {
     return axios({url:`/admin/person/delete-batch`,method:'post',data: params})
   },
+// 更新账户密码
+  updateAccountPassword:(accountId,srcpwd,password) =>{
+    return axios({url:`/admin/account/update-account-password/${accountId}`,
+     method:'post',params:{srcpwd:srcpwd,password:password}});
+  },
+  // 更新账户登录ID
+  updateAccountCode:(accountId,accountCode) =>{
+    return axios({url:`/admin/account/update-account-code/${accountId}`, method:'post',data:{accountCode:accountCode}});
+  },
+// 重置密码
+  resetAccountPassword:(account)=>{
+    return axios({url:`/admin/account/reset-account-password`, method:'post',data:account});
+  }
+ 
+  
 }

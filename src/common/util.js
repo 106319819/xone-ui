@@ -303,9 +303,15 @@ export default {
     });
     return p;
   },
-  prompt(message, options = { title: '提示'}) {
+  prompt(message, params,options = { title: '提示'}) {
     let p = new Promise((resolve, reject) => {
-      MessageBox.prompt(message, options).then(resolve).catch(reject);
+      MessageBox.prompt(message, options).then((result) => {
+        result.params = params;
+        resolve(result);      
+      }).catch((action)=>{
+        let result = {action:action,params:params};
+        reject(result);
+      });
     });
     return p;
   },

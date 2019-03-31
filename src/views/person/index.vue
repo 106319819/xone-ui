@@ -78,6 +78,10 @@
               <el-tooltip content="删除">
                 <el-button @click="onDeletePerson(scope.$index,scope.row)" icon="el-icon-delete" type="danger" circle ></el-button>
               </el-tooltip>
+              <el-tooltip content="密码重置">
+                <el-button @click="onResetAccountPassword(scope.$index,scope.row)" icon="el-icon-setting" type="primary" circle ></el-button>
+              </el-tooltip>
+
               <el-popover placement="right" trigger="click" @show="onShowRolesByPerson(scope.$index,scope.row)">
                 <el-select v-model="roles" multiple placeholder="请选择" >
                   <el-option v-for="item in items"
@@ -245,6 +249,16 @@ export default {
     onModify(data) {
       console.log("onModify");
       console.log(data);
+    },
+    onResetAccountPassword(index,row){
+      Util.prompt('请输入密码：',row).then(this.doResetAccountPassword).catch((action)=>{});
+    },
+    doResetAccountPassword(prompt){
+      let account = prompt.params.account;
+      account.password = prompt.value;
+      this.$api.person.resetAccountPassword(account).then(()=>{
+        Util.message("处理成功！");
+      }).catch(Util.error);
     },
     onDeletePerson(index, row){
       let that = this;

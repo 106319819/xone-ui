@@ -24,7 +24,7 @@
           <el-button size="small" icon="fa fa-male"> 个人中心</el-button>
         </span>    
         <span class="main-operation-item">
-          <el-button size="small" icon="fa fa-key"> 修改密码</el-button>
+          <el-button icon="fa fa-key" @click="onModifyPassword"> 修改密码</el-button>
         </span>    
     </div>
     <div class="other-operation">
@@ -57,6 +57,15 @@
     </div>
     <!--备份还原界面-->
     <!-- <backup ref="backupDialog" @afterRestore="afterRestore"></backup> -->
+
+    <dialog-form-password
+      ref="dialog-form-password"
+      title = "修改密码"
+      :modify= "true"
+      :person="dialog.person"
+      v-if="dialog.visible"
+      :visible.sync="dialog.visible"
+    ></dialog-form-password>
   </div>
 </template>
 
@@ -64,16 +73,25 @@
 // import Backup from "@/views/Backup/Backup"
 import Util from "../../common/util.js";
 import Helper from "../../router/helper.js"
+import DialogFormPassword from "./dialog-form-password"
 export default {
   name: 'PersonalPanel',
   components:{
     // Backup
+   "dialog-form-password": DialogFormPassword
   },
   props: {
     user: {type: Object,default: {}}
   },
   data() {
     return {
+        dialog: {
+        visible: false,
+        modify:false,
+        person: {fullName:'',
+          account:{accountId:'',accountCode:''}
+        }
+      },
     }
   },
   methods: {
@@ -109,8 +127,12 @@ export default {
       // alert("onSubSystem");
       Helper.loadSubSystemModules(this.user,subSystem);
       this.$emit('closeAll');
-      
-
+    },
+    onModifyPassword(){
+      this.dialog.person.account.accountId = this.user.accountId;
+      this.dialog.person.account.accountCode = this.user.accountCode;
+      this.dialog.person.fullName = this.user.fullName;
+      this.dialog.visible = true;
     }
   },
   mounted() {
