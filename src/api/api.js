@@ -11,6 +11,8 @@ import role from './modules/role'
 import roleModule from './modules/roleModule'
 import rolePerson from './modules/rolePerson'
 import host from './modules/host'
+import dictionary from './modules/dictionary'
+import dictionaryType from './modules/dictionaryType'
 
 // 默认全部导出
 export default {
@@ -22,5 +24,7 @@ export default {
     role,
     roleModule,
     rolePerson,
-    host
+    host,
+    dictionary,
+    dictionaryType
 }
