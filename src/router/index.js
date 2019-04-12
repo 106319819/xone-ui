@@ -2,7 +2,9 @@ import Vue from 'vue'
 import Router from 'vue-router'
 //静态测试
 // import Home from '@/views/Home'
+// const dynamic = false;
 // 动态生成
+const dynamic = true;
 import Home from '@/views/main/index'
 import Dashboard from '@/views/Dashboard'
 
@@ -17,7 +19,7 @@ import OrganizationEdit from '@/views/organization/edit-form'
 import ModuleIndex from '@/views/module/index'
 import RoleIndex from '@/views/role/index'
 import HostIndex from '@/views/host/index'
-
+import DictionaryIndex from '@/views/dictionary/index'
 import Helper from './helper.js'
 // 懒加载方式，当路由被访问的时候才加载对应组件
 const Login = resolve => require(['@/views/Login'], resolve);
@@ -116,6 +118,17 @@ let router = new Router({
     {
       path: '/',
       component: Home,
+      name: '字典管理',
+      menuShow: true,
+      leaf: true, // 只有一个节点
+      iconCls: 'iconfont icon-qunzu_o', // 图标样式class
+      children: [
+        {path: '/dictionary/index', component: DictionaryIndex, name: '字典管理', menuShow: true}
+      ]
+    },
+    {
+      path: '/',
+      component: Home,
       name: '设置',
       menuShow: true,
       iconCls: 'iconfont icon-quanjushezhi_o',
@@ -149,7 +162,9 @@ router.beforeEach((to, from, next) => {
       next({path: '/login'});
     } else {
       // 加载动态菜单和路由
-      Helper.addDynamicMenuAndRoutes(user, to, from);
+      if(dynamic){
+        Helper.addDynamicMenuAndRoutes(user, to, from);
+      }
       next();
     }
   }
