@@ -11,7 +11,7 @@
         <el-row>
           <el-col :span="8">
             <el-card :body-style="{ padding: '0px' }">
-              <img src="../assets/images/forest.png" class="image">
+              <img src="../assets/images/road.jpg" class="image">
               <div style="padding: 14px;">
                 <span>一个例子而已</span>
                 <div class="bottom clearfix">
@@ -22,18 +22,7 @@
           </el-col>
           <el-col :span="8">
             <el-card :body-style="{ padding: '0px' }">
-              <img src="../assets/images/sunrise.png" class="image">
-              <div style="padding: 14px;">
-                <span>我是一张卡片</span>
-                <div class="bottom clearfix">
-                  <time class="time">{{ currentDate }}</time>
-                </div>
-              </div>
-            </el-card>
-          </el-col>
-          <el-col :span="8">
-            <el-card :body-style="{ padding: '0px' }">
-              <img src="../assets/images/sunshine.png" class="image">
+              <img src="../assets/images/road3.jpg" class="image">
               <div style="padding: 14px;">
                 <span>快乐生活每一天</span>
                 <div class="bottom clearfix">
@@ -42,6 +31,18 @@
               </div>
             </el-card>
           </el-col>
+          <el-col :span="8">
+            <el-card :body-style="{ padding: '0px' }">
+              <img src="../assets/images/road2.jpg" class="image">
+              <div style="padding: 14px;">
+                <span>我是一张卡片</span>
+                <div class="bottom clearfix">
+                  <time class="time">{{ currentDate }}</time>
+                </div>
+              </div>
+            </el-card>
+          </el-col>
+          
           <el-col :span="12">
             <div id="chartColumn" style="width:100%; height:400px;"></div>
           </el-col>
